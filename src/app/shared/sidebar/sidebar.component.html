@@ -1,0 +1,73 @@
+<!-- ============================================================== -->
+<!-- Left Sidebar - style you can find in sidebar.scss  -->
+<!-- ============================================================== -->
+<aside class="left-sidebar">
+    <!-- Sidebar scroll-->
+    <div class="scroll-sidebar">
+        <!-- Sidebar navigation-->
+        <nav class="sidebar-nav">
+            <ul id="sidebarnav">
+                <!-- <li class="nav-small-cap">Encomiendas</li> -->
+                <li *ngFor="let menu of sidebar.menuDocumentos">
+                    <a class="has-arrow waves-effect waves-dark" aria-expanded="false"><i [class]="menu.icono"></i><span class="hide-menu">{{ menu.titulo }}</span></a>
+                    <ul aria-expanded="false" class="collapse">
+                        <li *ngFor="let submenu of menu.submenu">
+                            <a routerLinkActive="active" [routerLink]="[ submenu.url ]">{{ submenu.titulo }}</a>
+                        </li>
+                    </ul>
+                </li>
+
+                <!-- <li class="nav-devider"></li> -->
+                <!-- <li class="nav-small-cap">Orden de Transporte</li> -->
+                <li *ngFor="let menu of sidebar.menuOT">
+                    <!-- <span class="label label-rouded label-themecolor pull-right">4</span> -->
+                    <a class="has-arrow waves-effect waves-dark" aria-expanded="false"><i [class]="menu.icono"></i><span class="hide-menu">{{ menu.titulo }}</span></a>
+                    <ul aria-expanded="false" class="collapse">
+                        <li *ngFor="let submenu of menu.submenu">
+                            <a routerLinkActive="active" [routerLink]="[ submenu.url ]">{{ submenu.titulo }}</a>
+                        </li>
+                    </ul>
+                </li>
+
+                <!-- <div *ngIf=" admin "> -->
+                <!-- <li class="nav-devider" *ngIf=" admin "></li> -->
+                <!-- <li class="nav-small-cap" *ngIf=" admin ">Reportes</li> -->
+                <li *ngFor="let menu of sidebar.menuInformes">
+                    <a class="has-arrow waves-effect waves-dark" aria-expanded="false"><i [class]="menu.icono" style="padding-right: 10px;"></i><span class="hide-menu">{{ menu.titulo }}</span></a>
+                    <ul aria-expanded="false" class="collapse">
+                        <li *ngFor="let submenu of menu.submenu">
+                            <a routerLinkActive="active" [routerLink]="[ submenu.url ]">{{ submenu.titulo }}</a>
+                        </li>
+                    </ul>
+                </li>
+                <!-- <li class="nav-devider" *ngIf=" admin "></li> -->
+                <!-- <li class="nav-small-cap" *ngIf=" admin ">Configuración</li> -->
+                <li *ngFor="let menu of sidebar.menuUsuarios">
+                    <a class="has-arrow waves-effect waves-dark" aria-expanded="false"><i [class]="menu.icono" style="padding-right: 10px;"></i><span class="hide-menu">{{ menu.titulo }}</span></a>
+                    <ul aria-expanded="false" class="collapse">
+                        <li *ngFor="let submenu of menu.submenu">
+                            <a routerLinkActive="active" [routerLink]="[ submenu.url ]">{{ submenu.titulo }}</a>
+                        </li>
+                    </ul>
+                </li>
+                <!-- <li class="nav-small-cap">LOGIN / LOGOUT</li> -->
+                <li class="nav-devider"></li>
+                <li>
+                    <a class="has-arrow waves-effect waves-dark" aria-expanded="false"><i class="mdi mdi-account-settings"></i><span class="hide-menu">Login / Logout</span></a>
+                    <ul aria-expanded="false" class="collapse">
+                        <li><a routerLinkActive="active" routerLink="/login">Login</a></li>
+                        <li><a (click)="login.logout()">Logout</a></li>
+                    </ul>
+                </li>
+                <li class="nav-devider"></li>
+
+
+            </ul>
+        </nav>
+        <!-- End Sidebar navigation -->
+    </div>
+    <!-- End Sidebar scroll-->
+</aside>
+<!-- ============================================================== -->
+<!-- End Left Sidebar - style you can find in sidebar.scss  -->
+<!-- ============================================================== -->
