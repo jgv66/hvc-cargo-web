@@ -16,18 +16,18 @@ export class EncomiendasComponent implements OnInit {
   grabando = false;
   cargando = false;
   buscando = false;
+  buscandoChico = false;
   retiros = [];
   acopios = [];
   clientes = [];
   linea: any = {};
-  bodegas = [];
-  destinos = [];
-  auxiliares = [];
-  bodega;
+  carga: any = {};
+  clienteChico = [];
   fecha: Date;
   foto;
   idfoto;
   nombreorut = '';
+  buscarCliente = '';
   offset = 0;
 
   constructor( private router: Router,
@@ -109,7 +109,7 @@ export class EncomiendasComponent implements OnInit {
     this.buscando = true;
     this.stockSS.servicioWEB( '/clientes', { buscar: this.nombreorut, offset: this.offset } )
         .subscribe( (dev: any) => {
-            console.log(dev);
+            // console.log(dev);
             this.buscando = false;
             if ( dev.resultado === 'error' ) {
               Swal.fire( (this.nombreorut !== '' ) ? 'La búsqueda no obtuvo resultados' : 'No existen clientes definidos');
@@ -201,7 +201,92 @@ export class EncomiendasComponent implements OnInit {
     if ( this.nombreorut !== '' ) {
       this.offset = 0;
       this.cargarDatosClientes();
+    } else {
+      Swal.fire( 'No existen datos para buscar.' );
     }
   }
+
+  limpiaDataChica() {
+    this.buscarCliente = '';
+    this.clienteChico = [];
+  }
+
+  buscarClientesChico() {
+    if ( this.buscarCliente !== '' ) {
+      this.buscandoChico = true;
+      this.stockSS.servicioWEB( '/clientes', { buscar: this.buscarCliente, offset: this.offset } )
+          .subscribe( (dev: any) => {
+              // console.log(dev);
+              this.buscandoChico = false;
+              if ( dev.resultado === 'ok' ) {
+                this.clienteChico = dev.datos;
+              } else {
+                Swal.fire( 'La búsqueda no obtuvo resultados');
+              }
+          },
+          (error) => {
+            Swal.fire('ERROR', error);
+          });
+    }
+  }
+
+  initCarga() {
+    // origen
+    this.carga.id_paquete = 0;
+    this.carga.recepcionista = this.login.usuario.id;
+    this.carga.fecha_creacion = new Date();
+    this.carga.cliente = 0;
+    this.carga.xrutCliente = '';
+    this.carga.xemailCliente = '';
+    this.carga.xfonosCliente = '';
+    this.carga.xnombreCliente = '';
+    this.carga.xdireccCliente = '';
+    this.carga.xcomunaCliente = '';
+    this.carga.contacto = '';
+    this.carga.fecha_prometida = new Date();
+    this.carga.documento_legal = '';
+    this.carga.numero_legal = '';
+    this.carga.bultos = 0;
+    this.carga.peso = 0;
+    this.carga.volumen = 0;
+    this.carga.obs_carga = '';
+    this.carga.tipo_pago = '';
+    this.carga.valor_cobrado = '';
+    // destino
+    this.carga.destinatario = '';
+    this.carga.xrutDestino = '';
+    this.carga.xemailDestino = '';
+    this.carga.xfonosDestino = '';
+    this.carga.xnombreDestino = '';
+    this.carga.xdireccDestino = '';
+    this.carga.xcomunaDestino = '';
+  }
+
+  esteClienteDestino( item, cliente ) {
+    console.log(item);
+    console.log(cliente);
+    if ( cliente === true ) {
+      this.carga.cliente        = item.id_cliente;
+      this.carga.xrutCliente    = item.rut;
+      this.carga.xemailCliente  = item.email;
+      this.carga.xfonosCliente  = item.telefono1 + '   ' + item.telefono2;
+      this.carga.xnombreCliente = item.razon_social;
+      this.carga.xdireccCliente = item.direccion;
+      this.carga.xcomunaCliente = item.comuna;
+    } else {
+      this.carga.destinatario   = item.id_cliente;
+      this.carga.xrutDestino    = item.rut;
+      this.carga.xemailDestino  = item.email;
+      this.carga.xfonosDestino  = item.telefono1 + '   ' + item.telefono2;
+      this.carga.xnombreDestino = item.razon_social;
+      this.carga.xdireccDestino = item.direccion;
+      this.carga.xcomunaDestino = item.comuna;
+    }
+  }
+
+  crearEncomienda() {
+
+  }
+
 
 }
