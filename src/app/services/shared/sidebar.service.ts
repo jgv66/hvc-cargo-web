@@ -53,9 +53,7 @@ export class SidebarService {
       titulo: 'Orden de Transporte',
       icono: 'mdi mdi-cube-send',
       submenu: [
-        { titulo: 'Crear OT',         url: '/stock'   },
-        { titulo: 'Asignación de OT', url: '/stockP'  },
-        { titulo: 'Cierre de OT',     url: '/stockP'  },
+        { titulo: 'Mantención', url: '/ot' },
       ]
     }
   ];

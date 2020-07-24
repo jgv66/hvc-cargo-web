@@ -9,6 +9,7 @@ import { AccountSettingsComponent } from './account-settings/account-settings.co
 import { LoginGuardGuard } from '../services/guards/login-guard.guard';
 import { UsuariosComponent } from './usuarios/usuarios.component';
 import { EncomiendasComponent } from './encomiendas/encomiendas.component';
+import { OtComponent } from './ot/ot.component';
 
 const pagesRoutes: Routes = [
     {   path: '',
@@ -17,6 +18,7 @@ const pagesRoutes: Routes = [
         children: [
             { path: 'dashboard',         component: DashboardComponent       , data: { titulo: '' } },
             { path: 'encomiendas',       component: EncomiendasComponent     , data: { titulo: 'Registro de Encomiendas' } },
+            { path: 'ot',                component: OtComponent              , data: { titulo: 'Registro de Órdenes de Transporte' } },
             { path: 'account-settings',  component: AccountSettingsComponent , data: { titulo: 'Ajustes del Tema' } },
             { path: 'usuarios',          component: UsuariosComponent        , data: { titulo: 'Usuarios' } },
             { path: '',                  redirectTo: '/dashboard'            , pathMatch: 'full' }

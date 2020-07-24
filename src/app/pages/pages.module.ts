@@ -17,6 +17,7 @@ import { AccountSettingsComponent } from './account-settings/account-settings.co
 import { EditalineaComponent } from '../components/editalinea/editalinea.component';
 import { UsuariosComponent } from './usuarios/usuarios.component';
 import { EncomiendasComponent } from './encomiendas/encomiendas.component';
+import { OtComponent } from './ot/ot.component';
 
 @NgModule({
     declarations: [
@@ -25,7 +26,8 @@ import { EncomiendasComponent } from './encomiendas/encomiendas.component';
         AccountSettingsComponent,
         EditalineaComponent,
         UsuariosComponent,
-        EncomiendasComponent
+        EncomiendasComponent,
+        OtComponent
     ],
     exports: [
         DashboardComponent,
