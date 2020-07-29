@@ -1,16 +1,24 @@
 <nav>
     <div class="nav nav-tabs" id="nav-tab" role="tablist">
-        <a class="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#nav-contact" role="tab" aria-controls="nav-contact" aria-selected="false"><b>Nueva encomienda</b></a>
+        <a class="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#nav-contact" role="tab" aria-controls="nav-contact" aria-selected="false"><b>Encomiendas</b></a>
         <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true"><b>Retiros</b></a>
-        <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false"><b>En acopio</b></a>
+        <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false"><b>Acopios</b></a>
+        <a class="nav-item nav-link" id="nav-follow-tab" data-toggle="tab" href="#nav-follow" role="tab" aria-controls="nav-seguimiento" aria-selected="false"><b>Seguimientos</b></a>
         <a class="nav-item nav-link" id="nav-cliente-tab" data-toggle="tab" href="#nav-cliente" role="tab" aria-controls="nav-ccliente" aria-selected="false"><b>Clientes</b></a>
+        <!-- <a class="nav-item nav-link" id="nav-datatables" data-toggle="tab" href="#nav-datatable" role="tab" aria-controls="nav-datatables" aria-selected="false"><b>DataTables</b></a> -->
     </div>
 </nav>
 <div class="tab-content" id="nav-tabContent">
     <!-- Retiros -->
     <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
         <!-- sector de retiro -->
+        <button type="button" class="btn btn-link text-right" (click)="cargarDatosPendientes()" style="position: absolute;float: right;right: 26px;top: 140px;">
+            <i class="mdi mdi-refresh mdi-36px"></i>
+        </button>
         <div classs="card" style="margin-top: 5px;">
+            <div class="progress" *ngIf=" buscandoRetiros ">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;height: 5px;"></div>
+            </div>
             <table class="table table-striped table-hover table-sm">
                 <thead class="bg-dark text-light">
                     <tr translate="no">
@@ -20,45 +28,70 @@
                         <th scope="col" style="width:150px;">Fechas</th>
                         <th scope="col" style="width:150px;">Cobro</th>
                         <th scope="col" style="width:200px;">Estado</th>
-                        <th scope="col" style="width:100px;text-align:center;">Acción</th>
+                        <th scope="col" style="width:150px;text-align:center;">Acción</th>
                     </tr>
                 </thead>
                 <tbody translate="no" class="text-dark fuente75">
                     <tr *ngFor="let item of retiros">
-                        <td style="padding-top: 18px;" scope="row">
-                            <p>( <b>#{{item.id_paquete}}</b> ) {{item.cli_razon}}</p>
-                            <p>{{ item.cli_direccion }}, {{ item.cli_comuna}} </p>
-                            <p>{{ item.contacto }}</p>
-                            <p>{{ item.cli_referencias }}</p>
-                        </td>
-                        <td style="padding-top: 18px;" scope="row">
-                            <p>{{ item.des_razon }}</p>
-                            <p>{{ item.des_direccion }}, {{ item.des_comuna}} </p>
-                        </td>
-                        <td style="padding-top: 18px;" scope="row">
-                            <p>{{ item.obs_carga }}</p>
-                            <p><i class="mdi mdi-package-variant-closed mdi-18px"></i> {{ item.bultos }} </p>
-                            <p><i class="mdi mdi-weight-kilogram mdi-18px"></i> {{ item.peso | number:"1.0-2" }}Kg </p>
-                        </td>
-                        <td style="padding-top: 18px;" scope="row">
-                            <p><i class="mdi mdi-calendar-clock mdi-18px"></i> {{ item.fecha_creacion }}</p>
-                            <p><i class="mdi mdi-clock-fast mdi-18px"></i> {{ item.hora_creacion }}</p>
-                            <p><i class="mdi mdi-calendar-question mdi-18px"></i> {{ item.fecha_prometida }}</p>
-                        </td>
-                        <td style="padding-top: 18px; font-weight: bold; color: red" scope="row">
-                            <p>{{ item.tipo_pago }}</p>
-                            <p>${{ item.valor_cobrado | number:"1.0-0"}}</p>
-                        </td>
-                        <td style="padding-top: 18px;" scope="row">
-                            <p><i class="mdi mdi-comment-question-outline mdi-18px"></i> {{ item.estado }}</p>
-                            <p><i class="mdi mdi-calendar-clock mdi-18px"></i> {{ item.asignacion }}</p>
-                            <p><i class="mdi mdi-clock-fast mdi-18px"></i> {{ item.hora_asignacion }}</p>
-                            <p><i class="mdi mdi-account-settings mdi-18px"></i> {{ item.pickeador }}</p>
-                        </td>
-                        <td class="text-center">
-                            <a (click)="revisarEncomienda( item )" class="has-arrow waves-effect text-dark" style="margin-top:10px;"><i class="mdi mdi-lead-pencil mdi-24px"></i></a>
-                            <br>
-                            <a (click)="borrarEncomienda( item )" class="has-arrow waves-effect text-dark" style="margin-top:40px;"><i class="mdi mdi-delete-circle mdi-24px"></i></a>
+                        <td colspan="7" style="width:100%">
+                            <table style="width:100%; border-collapse: none !important; border-spacing: 0px!important;">
+                                <tr>
+                                    <td style="padding-top: 18px;width:370px;" scope="row">
+                                        <p> <a data-toggle="collapse" href="#id-{{item.id_paquete}}" role="button" aria-expanded="false" aria-controls="collapseExample">( <b>#{{item.id_paquete}}</b> )</a> {{item.cli_razon}}</p>
+                                    </td>
+                                    <td style="padding-top: 18px;width:320px;" scope="row">
+                                        <p>{{ item.des_razon }}</p>
+                                    </td>
+                                    <td style="padding-top: 18px;width:150px;" scope="row">
+                                        <p>{{ item.obs_carga }}</p>
+                                    </td>
+                                    <td style="padding-top: 18px;width:150px;" scope="row">
+                                        <p><i class="mdi mdi-calendar-clock mdi-18px"></i> {{ item.fecha_creacion }}</p>
+                                    </td>
+                                    <td style="padding-top: 18px;width:150px; font-weight: bold; color: red" scope="row">
+                                        <p>{{ item.tipo_pago }}</p>
+                                    </td>
+                                    <td style="padding-top: 18px;width:200px;" scope="row">
+                                        <p><i class="mdi mdi-comment-question-outline mdi-18px"></i> {{ item.estado }}</p>
+                                    </td>
+                                    <td class="text-center" style="width:150px;">
+                                        <a *ngIf=" login.usuario.admin " (click)="revisarEncomienda( item )" data-toggle="modal" data-target="#EditEncomienda" class="has-arrow waves-effect text-dark" style="margin-top:10px;">
+                                            <i class="mdi mdi-lead-pencil mdi-24px"></i>
+                                        </a>&nbsp;
+                                        <a *ngIf=" login.usuario.admin " (click)="borrarEncomienda( item )" class="has-arrow waves-effect text-dark" style="margin-top:10px;">
+                                            <i class="mdi mdi-delete-circle mdi-24px "></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr class="collapse" id="id-{{item.id_paquete}}">
+                                    <td scope="row">
+                                        <p>{{ item.cli_direccion }}, {{ item.cli_comuna}} </p>
+                                        <p>{{ item.contacto }}</p>
+                                        <p>{{ item.cli_referencias }}</p>
+                                    </td>
+                                    <td scope="row">
+                                        <p>{{ item.des_direccion }}, {{ item.des_comuna}} </p>
+                                    </td>
+                                    <td scope="row">
+                                        <p><i class="mdi mdi-package-variant-closed mdi-18px"></i> {{ item.bultos }} </p>
+                                        <p><i class="mdi mdi-weight-kilogram mdi-18px"></i> {{ item.peso | number:"1.0-2" }}Kg </p>
+                                    </td>
+                                    <td scope="row">
+                                        <p><i class="mdi mdi-clock-fast mdi-18px"></i> {{ item.hora_creacion }}</p>
+                                        <p><i class="mdi mdi-calendar-question mdi-18px"></i> {{ item.fecha_prometida }}</p>
+                                    </td>
+                                    <td style="padding-top: 18px; font-weight: bold; color: red" scope="row">
+                                        <p>${{ item.valor_cobrado | number:"1.0-0"}}</p>
+                                    </td>
+                                    <td scope="row">
+                                        <p><i class="mdi mdi-calendar-clock mdi-18px"></i> {{ item.asignacion }}</p>
+                                        <p><i class="mdi mdi-clock-fast mdi-18px"></i> {{ item.hora_asignacion }}</p>
+                                        <p><i class="mdi mdi-account-settings mdi-18px"></i> {{ item.pickeador }}</p>
+                                    </td>
+                                    <td class="text-center">
+                                    </td>
+                                </tr>
+                            </table>
                         </td>
                     </tr>
                 </tbody>
@@ -68,6 +101,10 @@
     <!-- Acopios -->
     <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
         <!-- sector de acopios -->
+        <button type="button" class="btn btn-link text-right" (click)="cargarDatosAcopio()" style="position: absolute;float: right;right: 26px;top: 140px;">
+            <i class="mdi mdi-refresh mdi-36px"></i>
+        </button>
+
         <div classs="card" style="margin-top: 5px;">
             <table class="table table-striped table-hover table-sm">
                 <thead class="bg-success text-light">
@@ -83,45 +120,73 @@
                 </thead>
                 <tbody translate="no" class="text-dark fuente75">
                     <tr *ngFor="let item of acopios">
-                        <td style="padding-top: 18px;" scope="row">
-                            <p>( <b>#{{item.id_paquete}}</b> ) {{item.cli_razon}}</p>
-                            <p>{{ item.cli_direccion }}, {{ item.cli_comuna}} </p>
-                        </td>
-                        <td style="padding-top: 18px;" scope="row">
-                            <p>{{ item.des_razon }}</p>
-                            <p>{{ item.des_direccion }}, {{ item.des_comuna}} </p>
-                            <p>{{ item.des_fono1 }}</p>
-                            <p>{{ item.des_referencias }}</p>
-                        </td>
-                        <td style="padding-top: 18px;" scope="row">
-                            <p>{{ item.obs_carga }}</p>
-                            <p><i class="mdi mdi-package-variant-closed mdi-18px"></i> {{ item.bultos }} </p>
-                            <p><i class="mdi mdi-weight-kilogram mdi-18px"></i> {{ item.peso | number:"1.0-2" }}Kg </p>
-                            <div *ngIf=" item.obs_pickeo !== '' " style="font-weight: bold; color: red" scope="row">
-                                <p><i class="mdi mdi-contrast-circle mdi-18px"></i> {{ item.obs_pickeo }} </p>
-                            </div>
-                        </td>
-                        <td style="padding-top: 18px;" scope="row">
-                            <p><i class="mdi mdi-calendar-clock mdi-18px"></i> {{ item.fecha_creacion }}</p>
-                            <p><i class="mdi mdi-clock-fast mdi-18px"></i> {{ item.hora_creacion }}</p>
-                            <p><i class="mdi mdi-calendar-question mdi-18px"></i> {{ item.fecha_prometida }}</p>
-                        </td>
-                        <td style="padding-top: 18px; font-weight: bold; color: red" scope="row">
-                            <p>{{ item.tipo_pago }}</p>
-                            <p>${{ item.valor_cobrado | number:"1.0-0"}}</p>
-                        </td>
-                        <td style="padding-top: 18px;" scope="row">
-                            <p><i class="mdi mdi-comment-question-outline mdi-18px"></i> {{ item.estado }}</p>
-                            <p><i class="mdi mdi-calendar-clock mdi-18px"></i> {{ item.asignacion }}</p>
-                            <p><i class="mdi mdi-clock-fast mdi-18px"></i> {{ item.hora_asignacion }}</p>
-                            <p><i class="mdi mdi-account-settings mdi-18px"></i> {{ item.pickeador }}</p>
-                        </td>
-                        <td class="text-center">
-                            <a (click)="cargarFoto( item )" data-toggle="modal" data-target="#exampleModal" class="has-arrow waves-effect text-dark" style="margin-top: 10px;"><i class="mdi mdi-camera mdi-24px"></i></a>
-                            <br>
-                            <a (click)="revisarEncomienda( item )" class="has-arrow waves-effect text-dark" style="margin-top: 10px;"><i class="mdi mdi-lead-pencil mdi-24px"></i></a>
-                            <br>
-                            <a (click)="borrarEncomienda( item )" class="has-arrow waves-effect text-dark" style="margin-top: 30px;"><i class="mdi mdi-delete-circle mdi-24px"></i></a>
+                        <td colspan="7" style="width:100%">
+                            <table style="width:100%; border-collapse: none !important; border-spacing: 0px!important;">
+                                <!-- parte superior -->
+                                <tr>
+                                    <td style="padding-top: 18px; width:300px;" scope="row">
+                                        <p>
+                                            <a data-toggle="collapse" href="#id-{{item.id_paquete}}" role="button" aria-expanded="false" aria-controls="collapseExample">
+                                                ( <b>#{{item.id_paquete}}</b> )
+                                            </a> {{item.cli_razon}}
+                                        </p>
+                                    </td>
+                                    <td style="padding-top: 18px;width:360px;" scope="row">
+                                        <p>{{ item.des_razon }}</p>
+                                    </td>
+                                    <td style="padding-top: 18px;width:180px;" scope="row">
+                                        <p>{{ item.obs_carga }}</p>
+                                    </td>
+                                    <td style="padding-top: 18px;width:150px;" scope="row">
+                                        <p><i class="mdi mdi-calendar-clock mdi-18px"></i> {{ item.fecha_creacion }}</p>
+                                    </td>
+                                    <td style="padding-top: 18px; font-weight: bold; color: red; width:150px;" scope="row">
+                                        <p>{{ item.tipo_pago }}</p>
+                                    </td>
+                                    <td style="padding-top: 18px;width:200px;" scope="row">
+                                        <p><i class="mdi mdi-comment-question-outline mdi-18px"></i> {{ item.estado }}</p>
+                                    </td>
+                                    <td class="text-center" style="width:100px;">
+                                        <a (click)="cargarFoto( item )" data-toggle="modal" data-target="#exampleModal" class="has-arrow waves-effect text-dark" style="margin-top: 10px;">
+                                            <i class="mdi mdi-camera mdi-24px"></i>
+                                        </a>&nbsp;
+                                        <a (click)="revisarEncomienda( item )" class="has-arrow waves-effect text-dark" style="margin-top: 10px;">
+                                            <i class="mdi mdi-lead-pencil mdi-24px"></i>
+                                        </a>&nbsp;
+                                        <a (click)="borrarEncomienda( item )" class="has-arrow waves-effect text-dark" style="margin-top: 10px;">
+                                            <i class="mdi mdi-delete-circle mdi-24px"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr class="collapse" id="id-{{item.id_paquete}}">
+                                    <td scope="row">
+                                        <p>{{ item.cli_direccion }}, {{ item.cli_comuna}} </p>
+                                        <p>{{ item.contacto }}</p>
+                                        <p>{{ item.cli_referencias }}</p>
+                                    </td>
+                                    <td scope="row">
+                                        <p>{{ item.des_direccion }}, {{ item.des_comuna}} </p>
+                                    </td>
+                                    <td scope="row">
+                                        <p><i class="mdi mdi-package-variant-closed mdi-18px"></i> {{ item.bultos }} </p>
+                                        <p><i class="mdi mdi-weight-kilogram mdi-18px"></i> {{ item.peso | number:"1.0-2" }}Kg </p>
+                                    </td>
+                                    <td scope="row">
+                                        <p><i class="mdi mdi-clock-fast mdi-18px"></i> {{ item.hora_creacion }}</p>
+                                        <p><i class="mdi mdi-calendar-question mdi-18px"></i> {{ item.fecha_prometida }}</p>
+                                    </td>
+                                    <td scope="row" style="font-weight: bold; color: red;">
+                                        <p>${{ item.valor_cobrado | number:"1.0-0"}}</p>
+                                    </td>
+                                    <td scope="row">
+                                        <p><i class="mdi mdi-calendar-clock mdi-18px"></i> {{ item.asignacion }}</p>
+                                        <p><i class="mdi mdi-clock-fast mdi-18px"></i> {{ item.hora_asignacion }}</p>
+                                        <p><i class="mdi mdi-account-settings mdi-18px"></i> {{ item.pickeador }}</p>
+                                    </td>
+                                    <td>
+                                    </td>
+                                </tr>
+                            </table>
                         </td>
                     </tr>
                 </tbody>
@@ -192,6 +257,58 @@
             </table>
         </div>
     </div>
+    <!-- seguimientos -->
+    <div class="tab-pane fade" id="nav-follow" role="tabpanel" aria-labelledby="nav-seguimiento-tab">
+        <div classs="card" style="margin-top: 5px;">
+            <!-- buscar paquete -->
+            <form (ngSubmit)="buscarPaquete()">
+                <div class="form-row mt-2">
+                    <div class="col-6">
+                        <label class="col-3 col-form-label text-left">Buscar Paquete</label>
+                        <input class="col-4 form-control" type="text" name="idpqt" [(ngModel)]="idpqt" placeholder="digite el ID de seguimiento...">
+                        <button type="submit" class="btn btn-outline-dark mb-2" style="padding-top:7px; margin-top: 5px; margin-left: 10px;">Buscar</button>
+                    </div>
+                    <div class="col-1">
+                    </div>
+                </div>
+            </form>
+            <div class="progress" *ngIf=" buscandoID ">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;height: 5px;"></div>
+            </div>
+
+            <!-- grilla de clientes -->
+            <table class="table table-striped table-sm">
+                <thead class="bg-dark text-light">
+                    <tr translate="no">
+                        <th scope="col" style="width:150px;">#Seguimiento</th>
+                        <th scope="col" style="width:150px;">Fecha</th>
+                        <th scope="col" style="width:120px;">Hora</th>
+                        <th scope="col" style="width:300px;">Usuario</th>
+                        <th scope="col" style="width:350px;">Comentario</th>
+                    </tr>
+                </thead>
+                <tbody translate="no" class="text-dark fuente75">
+                    <tr *ngFor="let item of estados">
+                        <td style="padding-top: 18px;" scope="row">
+                            <p>{{item.id_paquete}}</p>
+                        </td>
+                        <td style="padding-top: 18px;" scope="row">
+                            <p>{{item.fecha}}</p>
+                        </td>
+                        <td style="padding-top: 18px;" scope="row">
+                            <p>{{ item.hora }}</p>
+                        </td>
+                        <td style="padding-top: 18px;" scope="row">
+                            <p>{{ item.nombre }}</p>
+                        </td>
+                        <td style="padding-top: 18px;" scope="row">
+                            <p>{{ item.comentario }}</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
     <!-- Nueva Encomienda -->
     <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">
         <div classs="card" style="margin-top: 5px;">
@@ -235,17 +352,17 @@
                             </div>
                             <div class="col-md-3">
                                 <label>Contacto Pickeo (quién entrega?)</label>
-                                <input type="text" class="form-control" name="carga.contacto" [(ngModel)]="carga.contacto">
+                                <input clearInput="true" type="text" class="form-control" name="carga.contacto" [(ngModel)]="carga.contacto">
                             </div>
                             <div class="col-md-2">
                                 <label>Fecha en destino</label>
-                                <input type="date" class="form-control" name="fecha_prometida" [(ngModel)]="carga.fecha_prometida">
+                                <input clearInput="true" type="date" class="form-control" name="fecha_prometida" [(ngModel)]="carga.fecha_prometida">
                             </div>
                         </div>
                         <div class="row" style="margin-top: 10px;">
                             <div class="col-md-2">
                                 <label>Valor Encomienda</label>
-                                <input type="number" class="form-control" name="carga.valor_cobrado" [(ngModel)]="carga.valor_cobrado">
+                                <input clearInput="true" type="number" class="form-control" name="carga.valor_cobrado" [(ngModel)]="carga.valor_cobrado">
                             </div>
                             <div class="col-md-3">
                                 <label>Tipo Pago</label>
@@ -256,23 +373,23 @@
                             </div>
                             <div class="col-md-2">
                                 <label>Tipo de Carga</label>
-                                <input type="text" class="form-control" name="carga.obs_carga" [(ngModel)]="carga.obs_carga">
+                                <input clearInput="true" type="text" class="form-control" name="carga.obs_carga" [(ngModel)]="carga.obs_carga">
                             </div>
                             <div class="col-md-1">
                                 <label>Bultos</label>
-                                <input type="number" class="form-control" name="carga.bultos" [(ngModel)]="carga.bultos">
+                                <input clearInput="true" type="number" class="form-control" name="carga.bultos" [(ngModel)]="carga.bultos">
                             </div>
                             <div class="col-md-1">
                                 <label>Peso (Kg)</label>
-                                <input type="number" class="form-control" name="carga.peso" [(ngModel)]="carga.peso">
+                                <input clearInput="true" type="number" class="form-control" name="carga.peso" [(ngModel)]="carga.peso">
                             </div>
                             <div class="col-md-1">
                                 <label>Volumen (m3)</label>
-                                <input type="number" class="form-control" name="carga.volumen" [(ngModel)]="carga.volumen">
+                                <input clearInput="true" type="number" class="form-control" name="carga.volumen" [(ngModel)]="carga.volumen">
                             </div>
                             <div class="col-md-2">
                                 <label>Tipo y Nro.de Documento</label>
-                                <input type="text" class="form-control" name="carga.numero_legal" [(ngModel)]="carga.numero_legal">
+                                <input clearInput="true" type="text" class="form-control" name="carga.numero_legal" [(ngModel)]="carga.numero_legal">
                             </div>
                         </div>
                     </div>
@@ -313,6 +430,9 @@
                             </div>
                         </div>
                     </div>
+                </div>
+                <div class="progress" *ngIf=" grabandoEnco ">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;height: 5px;"></div>
                 </div>
                 <button type="submit" class="btn btn-primary">Grabar los datos de Encomienda</button>
             </form>
@@ -515,6 +635,68 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
                 <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="grabarCliente()">Grabar y actualizar</button>
+            </div>
+        </div>
+    </div>
+    <!-- 
+                </div>
+         -->
+</div>
+
+<!-- Modal editar encomienda -->
+<div class="modal fade" id="EditEncomienda" tabindex="-1" role="dialog" aria-labelledby="EditEncomiendaLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content" style="width: 670px;">
+            <div class="modal-header">
+                <h4 class="modal-title" id="ModalCenteredCrearLabel">Datos Editables de la Encomienda <b>( #{{ encomienda.id_paquete }} )</b></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row" style="margin-top: 10px;">
+                    <div class="col-12" style="margin-top: 10px;">
+                        <label class="col-3 col-form-label">Cliente</label>
+                        <input readonly class="form-control col-9" type="text" name="razon" [(ngModel)]="encomienda.cli_razon">
+                    </div>
+                    <div class="col-12" style="margin-top: 10px;">
+                        <label class="col-3 col-form-label">Contacto</label>
+                        <input class="form-control col-9" type="text" name="contacto" [(ngModel)]="encomienda.contacto">
+                    </div>
+                    <div class="col-12" style="margin-top: 10px;">
+                        <label class="col-3 col-form-label">Fecha destino</label>
+                        <input class="form-control col-4" type="date" name="encomienda.llegada" [(ngModel)]="encomienda.llegada">
+                        <label class="col-2 col-form-label text-right">Valor</label>
+                        <input class="form-control col-3" type="number" name="valor" [(ngModel)]="encomienda.valor_cobrado">
+                    </div>
+                    <div class="col-12" style="margin-top: 10px;">
+                        <label class="col-3 col-form-label text-left">Tipo Pago</label>
+                        <select class="form-control text-left col-9" name="tipo_pago" [(ngModel)]="encomienda.tipo_pago" styles="max-width: 478px;">
+                            <option value=""></option>
+                            <option *ngFor="let tp of login.tiposDePago" [value]="tp.tipo_pago">{{ tp.descripcion }}</option>
+                        </select>
+                    </div>
+                    <div class="col-12" style="margin-top: 10px;">
+                        <label class="col-3 col-form-label">Tipo Carga</label>
+                        <input class="form-control col-9" type="text" name="carga" [(ngModel)]="encomienda.obs_carga">
+                    </div>
+                    <div class="col-12" style="margin-top: 10px;">
+                        <label class="col-3 col-form-label">Bultos</label>
+                        <input class="form-control col-3" type="number" name="bultos" [(ngModel)]="encomienda.bultos">
+                        <label class="col-3 col-form-label text-right">Peso (Kg)</label>
+                        <input class="form-control col-3" type="number" name="peso" [(ngModel)]="encomienda.peso">
+                    </div>
+                    <div class="col-12" style="margin-top: 10px;">
+                        <label class="col-3 col-form-label">Volumen (m3)</label>
+                        <input class="form-control col-2" type="number" name="volumen" [(ngModel)]="encomienda.volumen">
+                        <label class="col-4 col-form-label text-right">Tipo y Nro.Doc.Legal</label>
+                        <input class="form-control col-3" type="text" name="numero_legal" [(ngModel)]="encomienda.numero_legal">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="updateEncomienda()">Grabar y actualizar</button>
             </div>
         </div>
     </div>

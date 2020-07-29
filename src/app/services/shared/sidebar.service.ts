@@ -41,7 +41,7 @@ export class SidebarService {
   menuDocumentos: any = [
     {
       titulo: 'Encomiendas',
-      icono: 'mdi mdi-cube-send',
+      icono: 'mdi mdi-package-variant',
       submenu: [
         { titulo: 'Mantención', url: '/encomiendas' },
       ]
