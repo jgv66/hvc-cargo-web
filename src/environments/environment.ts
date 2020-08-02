@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  API_URL: 'http://23.239.29.171:3055'
+  API_URL: 'https://api.kinetik.cl/hvc'
 };
 
 /*

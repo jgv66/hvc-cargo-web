@@ -13,6 +13,7 @@ export class LoginService implements OnInit {
   ciudadesPermitidas = [];
   tiposDePago = [];
   usuarios = [];
+  estados = [];
 
   constructor(private http: HttpClient,
               private router: Router) {
@@ -42,6 +43,7 @@ export class LoginService implements OnInit {
     this.usuario = user;
     this.ciudades();
     this.tiposdepago();
+    this.losEstados();
     this.retrieveUsuarios();
   }
 
@@ -50,7 +52,7 @@ export class LoginService implements OnInit {
     const xUrl = this.url + '/ciudades' ;
     this.http.get( xUrl )
         .subscribe( (data: any) => {
-            console.log(data);
+            // console.log(data);
             try {
               this.ciudadesPermitidas = ( data.datos.length > 0 ) ? data.datos : [];
             } catch (error) {
@@ -58,7 +60,7 @@ export class LoginService implements OnInit {
             }
           },
           (err) => {
-            return console.log('Err', err);
+            console.log('ciudades()', err);
           }
         );
   }
@@ -67,7 +69,7 @@ export class LoginService implements OnInit {
     const xUrl = this.url + '/tipopago' ;
     this.http.get( xUrl, {} )
         .subscribe( (data: any) => {
-            console.log(data);
+            // console.log(data);
             try {
               this.tiposDePago = ( data.datos.length > 0 ) ? data.datos : [];
             } catch (error) {
@@ -75,16 +77,32 @@ export class LoginService implements OnInit {
             }
         },
         (err) => {
-          return console.log('Err', err);
+          console.log('tiposdepago()', err);
         }
       );
     }
+
+  losEstados() {
+    const xUrl = this.url + '/estados' ;
+    this.http.get( xUrl )
+      .subscribe( (data: any) => {
+        try {
+          this.estados = ( data.datos.length > 0 ) ? data.datos : [];
+        } catch (error) {
+          this.estados = [];
+        }
+      },
+      (error) => {
+        console.log('losEstados()', error );
+      });
+      //
+  }
 
   retrieveUsuarios() {
     const xUrl = this.url + '/usuarios' ;
     this.http.get( xUrl )
         .subscribe( (data: any) => {
-          console.log(data);
+          // console.log(data);
           try {
             this.usuarios = ( data.datos.length > 0 ) ? data.datos : [];
           } catch (error) {
@@ -92,7 +110,7 @@ export class LoginService implements OnInit {
           }
         },
         (err) => {
-          return console.log('Err', err);
+          console.log('retrieveUsuarios()', err);
         }
       );
   }

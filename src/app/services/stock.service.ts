@@ -1,6 +1,7 @@
 import { environment } from '../../environments/environment';
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
+
 
 @Injectable({
   providedIn: 'root'
@@ -24,6 +25,16 @@ export class StockService {
     const url    = this.url + cSP;
     const body   = parametros;
     return this.http.post( url, body );
+  }
+
+  getServicioWEB( cSP: string, parametros?: any ) {
+    const params = new HttpParams().append('param', JSON.stringify(parametros));
+    const url    = this.url + cSP;
+    if ( parametros ) {
+      return this.http.get( url,  { params } );
+    } else {
+      return this.http.get( url );
+    }
   }
 
   // set a key/value

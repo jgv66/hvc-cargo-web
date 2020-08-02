@@ -21,7 +21,7 @@ export class EncomiendasComponent implements OnInit {
   enProceso = false;
   grabandoEnco = false;
   retiros = [];
-  encomienda: any[] = [];
+  encomienda = {};
   acopios = [];
   clientes = [];
   linea: any = {};
@@ -35,7 +35,11 @@ export class EncomiendasComponent implements OnInit {
   offset = 0;
   idpqt: number;
   buscandoID = false;
+  estadosPqt = [];
   estados = [];
+  estaPosicion = 0;
+  buscarUsuario = '';
+  cerrarPQT = false;
 
   constructor( private router: Router,
                public login: LoginService,
@@ -54,14 +58,16 @@ export class EncomiendasComponent implements OnInit {
   cargarDatosPendientes( event? ) {
     this.cargando = true;
     this.retiros  = [];
+    this.buscandoRetiros = true;
     this.stockSS.servicioWEB( '/pickpend', { ficha: this.login.usuario.id, todos: '*' } )
         .subscribe( (dev: any) => {
-            console.log(dev);
+            // console.log(dev);
             this.cargando = false;
+            this.buscandoRetiros = false;
             if ( dev.resultado === 'error' ) {
               Swal.fire('No existen retiros pendientes');
             } else if ( dev.resultado === 'nodata' ) {
-              Swal.fire('No existen retiros pendientes');
+              // Swal.fire('No existen retiros pendientes');
             } else {
               this.retiros = dev.datos;
             }
@@ -82,12 +88,12 @@ export class EncomiendasComponent implements OnInit {
     this.acopios = [];
     this.stockSS.servicioWEB( '/acopiar', { ficha: this.login.usuario.id, todos: '*' } )
         .subscribe( (dev: any) => {
-            console.log(dev);
+            // console.log(dev);
             this.cargando = false;
             if ( dev.resultado === 'error' ) {
               Swal.fire('No existen acopios pendientes');
             } else if ( dev.resultado === 'nodata' ) {
-              Swal.fire('No existen acopios pendientes');
+              // Swal.fire('No existen acopios pendientes');
             } else {
               this.acopios = dev.datos;
             }
@@ -96,7 +102,10 @@ export class EncomiendasComponent implements OnInit {
             }
         },
         (error) => {
-          Swal.fire(error);
+          if ( error ) {
+            console.log(error);
+            Swal.fire(error);
+          }
         });
   }
   doRefreshAcopio( event ) {
@@ -142,31 +151,31 @@ export class EncomiendasComponent implements OnInit {
 
   revisarEncomienda( item ) {
     this.encomienda = item;
-    console.log(this.encomienda);
+    // console.log(this.encomienda);
   }
   updateEncomienda() {
     // validar lo datos
-    console.log(this.encomienda);
+    // console.log(this.encomienda);
     // si ya estamos procesando....
-    this.encomienda.fecha_prometida = this.encomienda.llegada;
-    if ( this.encomienda.fecha_prometida === undefined || this.encomienda.fecha_prometida === null ) {
+    this.encomienda['fecha_prometida'] = this.encomienda['llegada'];
+    if ( this.encomienda['fecha_prometida'] === undefined || this.encomienda['fecha_prometida'] === null ) {
       Swal.fire('CUIDADO', 'Fecha prometida de llegada no esta definida.');
-    } else if ( this.encomienda.valor_cobrado < 0 || ( this.encomienda.valor_cobrado === 0 && this.encomienda.tipo_pago !== 'GRATIS' ) ) {
+    } else if ( this.encomienda['valor_cobrado'] < 0 || ( this.encomienda['valor_cobrado'] === 0 && this.encomienda['tipo_pago'] !== 'GRATIS' ) ) {
       Swal.fire('CUIDADO', 'Debe indicar valor cobrado por la encomienda.');
-    } else if ( this.encomienda.tipo_pago === '' ) {
+    } else if ( this.encomienda['tipo_pago'] === '' ) {
       Swal.fire('CUIDADO', 'Debe indicar el tipo de pago de la encomienda.');
-    } else if ( this.encomienda.obs_carga === '' ) {
+    } else if ( this.encomienda['obs_carga'] === '' ) {
       Swal.fire('CUIDADO', 'Debe indicar el tipo de encomienda que será transportada.');
-    } else if ( this.encomienda.bultos < 0 || this.encomienda.bultos === 0 ) {
+    } else if ( this.encomienda['bultos'] < 0 || this.encomienda['bultos'] === 0 ) {
       Swal.fire('CUIDADO', 'Debe indicar la cantidad de bultos de la encomienda.');
-    } else if ( this.encomienda.peso < 0 || this.encomienda.peso === 0 ) {
+    } else if ( this.encomienda['peso'] < 0 || this.encomienda['peso'] === 0 ) {
       Swal.fire('CUIDADO', 'Debe indicar el peso de la encomienda.');
-    } else if ( this.encomienda.volumen < 0 || this.encomienda.volumen === 0 ) {
+    } else if ( this.encomienda['volumen'] < 0 || this.encomienda['volumen'] === 0 ) {
       Swal.fire('CUIDADO', 'Debe indicar el volumen de la encomienda.');
     } else {
       Swal.fire({
         title: 'Actualizaremos...',
-        text: 'Esta acción actualizará los datos de la encomienda ' + this.encomienda.id_paquete.toString() + ' en el sistema',
+        text: 'Esta acción actualizará los datos de la encomienda ' + this.encomienda['id_paquete'].toString() + ' en el sistema',
         icon: 'warning',
         showCancelButton: true,
         cancelButtonText: 'No, abandonar...',
@@ -180,27 +189,24 @@ export class EncomiendasComponent implements OnInit {
       });
     }
   }
-
   async regrabarEncomienda() {
     this.buscandoRetiros = true;
     // origen
-    const carga = { id_paquete: this.encomienda.id_paquete,
+    const carga = { id_paquete: this.encomienda['id_paquete'],
                     recepcionista: this.login.usuario.id,
-                    fecha_creacion: this.encomienda.fecha_creacion,
-                    cliente: this.encomienda.cliente,
-                    contacto: this.encomienda.contacto,
-                    fecha_prometida: this.encomienda.fecha_prometida,
-                    documento_legal: this.encomienda.documento_legal || '',
-                    numero_legal: this.encomienda.numero_legal,
-                    bultos: this.encomienda.bultos,
-                    peso: this.encomienda.peso,
-                    volumen: this.encomienda.volumen,
-                    obs_carga: this.encomienda.obs_carga,
-                    tipo_pago: this.encomienda.tipo_pago,
-                    valor_cobrado: this.encomienda.valor_cobrado,
-                    destinatario: this.encomienda.destinatario };
-    //
-    console.log(carga);
+                    fecha_creacion: this.encomienda['fecha_creacion'],
+                    cliente: this.encomienda['cliente'],
+                    contacto: this.encomienda['contacto'],
+                    fecha_prometida: this.encomienda['fecha_prometida'],
+                    documento_legal: this.encomienda['documento_legal'] || '',
+                    numero_legal: this.encomienda['numero_legal'],
+                    bultos: this.encomienda['bultos'],
+                    peso: this.encomienda['peso'],
+                    volumen: this.encomienda['volumen'],
+                    obs_carga: this.encomienda['obs_carga'],
+                    tipo_pago: this.encomienda['tipo_pago'],
+                    valor_cobrado: this.encomienda['valor_cobrado'],
+                    destinatario: this.encomienda['destinatario'] };
     //
     await this.stockSS.servicioWEB( '/grabarEncomienda', carga )
       .subscribe( (data: any) => {
@@ -231,10 +237,9 @@ export class EncomiendasComponent implements OnInit {
       },
       (err) => {
         this.buscandoRetiros = false;
-        console.log(err);
+        // console.log(err);
       });
   }
-
 
   borrarEncomienda( item ) {
     Swal.fire({
@@ -511,24 +516,156 @@ export class EncomiendasComponent implements OnInit {
       });
   }
 
-  buscarPaquete() {
+  async buscarPaquete( cambio? ) {
     if ( this.idpqt !== 0 ) {
       this.buscandoID = true;
-      this.estados = [];
-      this.stockSS.servicioWEB( '/estado_pqt', { idpqt: this.idpqt } )
-          .subscribe( (dev: any) => {
-              console.log(dev);
-              this.buscandoID = false;
-              if ( dev.resultado === 'ok' ) {
-                this.estados = dev.datos;
-              } else {
+      this.estadosPqt = [];
+      await this.stockSS.servicioWEB( '/estado_pqt', { idpqt: this.idpqt } )
+        .subscribe( (dev: any) => {
+            console.log(dev);
+            this.buscandoID = false;
+            if ( dev.resultado === 'ok' ) {
+              this.estadosPqt = dev.datos;
+            } else {
+              if ( !cambio ) {
                 Swal.fire( 'La búsqueda no obtuvo resultados');
               }
-          },
-          (error) => {
-            Swal.fire('ERROR', error);
-          });
+            }
+        },
+        (error) => {
+          Swal.fire('ERROR', error);
+        });
     }
+  }
+
+  async cambiodeEstado( item ) {
+    // limpiar para asignar
+    this.login.estados.forEach( element => {
+        element.id_estado = 0;
+        element.marcada   = false;
+        element.anterior  = false;
+        element.nombre    = '';
+        element.fecha_entera = null;
+    });
+    //
+    this.cerrarPQT = false;
+    this.estados = this.login.estados;
+    this.estadosPqt = [];
+    this.buscandoRetiros = true;
+    this.idpqt = item.id_paquete;
+    //
+    this.stockSS.servicioWEB( '/estado_pqt', { idpqt: this.idpqt } )
+      .subscribe( (dev: any) => {
+        this.buscandoRetiros = false;
+        if ( dev.resultado === 'ok' ) {
+            this.estadosPqt = dev.datos;
+            // console.log('this.estadosPqt', this.estadosPqt);
+            // revisar estados
+            let pos = 0; let i = -1;
+            this.estados.forEach(element => {
+              ++i;
+              pos = this.estadosPqt.findIndex( (est: any) => est.estado === element.estado );
+              if ( pos !== -1 ) {
+                this.estados[i].id_estado    = this.estadosPqt[pos].id;
+                this.estados[i].fecha_entera = this.estadosPqt[pos].fecha_entera;
+                this.estados[i].marcada      = true;
+                this.estados[i].anterior     = true;
+                this.estados[i].nombre       = this.estadosPqt[pos].nombre;
+                this.estados[i].usuario      = this.estadosPqt[pos].usuario;
+              }
+            });
+          }
+      },
+      (error) => {
+        this.buscandoRetiros = false;
+        Swal.fire('ERROR', error);
+      });
+    //
+  }
+  cambiarUsuario( item ) {
+    this.estaPosicion = item.estado;
+  }
+  esteUsuario( item ) {
+    if ( item.id > 0 || item.id === 0 ) {
+      this.estados.forEach( element => {
+        if ( element.estado === this.estaPosicion ) {
+          element.usuario = item.id;
+          element.nombre  = item.nombre;
+        }
+      });
+    }
+  }
+  cambiandoEstado( item ) {
+    if ( item.anterior === true ) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Cuidado...',
+        text: 'No puede deshacer un hecho pasado, solo puede cambiar el Usuario asignado',
+      });
+    } else {
+      item.marcada = !item.marcada;
+      if ( item.marcada ) {
+        item.usuario      = this.login.usuario.id;
+        item.nombre       = this.login.usuario.nombre;
+        item.fecha_entera = new Date();
+      } else {
+        item.usuario      = 0;
+        item.nombre       = '';
+        item.fecha_entera = null;
+      }
+    }
+  }
+
+  updateEstados() {
+    const texto = 'Esta acción actualizará los estados de la encomienda en el sistema' + (this.cerrarPQT) ? '. Y cerrará el registro. Está de acuerdo?' : '';
+    Swal.fire({
+      title: 'Grabaremos...',
+      text: texto,
+      icon: 'warning',
+      showCancelButton: true,
+      cancelButtonText: 'No, abandonar...',
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, actualizar!'
+    }).then((result) => {
+      if (result.value) {
+        this.grabarEstados();
+      }
+    });
+
+  }
+
+  async grabarEstados() {
+    this.buscandoRetiros = true;
+    // origen
+    const carga = { id_paquete: this.idpqt,
+                    cierre: this.cerrarPQT,
+                    estados: this.estados };
+    //
+    await this.stockSS.servicioWEB( '/grabarEstados', carga )
+      .subscribe( (data: any) => {
+          //
+          this.buscandoRetiros = false;
+          //
+          console.log(data);
+          if ( data.resultado === 'ok' ) {
+            //
+            Swal.fire({
+              icon: 'success',
+              title: 'Nro.Encomienda: ' + data.datos[0].id_pqt,
+              text: 'El cambio de estado de la encomienda fue grabado con éxito',
+              footer: '<a href>Nro.Interno : ' + data.datos[0].id_pqt + ' </a>'
+            });
+            //
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Cuidado...',
+              text: 'Los datos de cambio de estado de la encomienda no fueron grabados',
+              footer: '<a href>' + data.datos + '</a>'
+            });
+          }
+      });
   }
 
 }

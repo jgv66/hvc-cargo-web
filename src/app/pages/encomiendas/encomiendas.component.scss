@@ -6,3 +6,22 @@
 p {
     margin-bottom: 5px;
 }
+
+.sinBorde {
+    border: 0;
+    border-bottom: 0px solid #000;
+    height: 24px;
+    padding-top: 18px;
+}
+
+.modal-body-scroll {
+    height: 500px;
+    width: 100%;
+    overflow-y: auto;
+}
+
+select option {
+    display: block;
+    text-overflow: ellipsis;
+    max-height: 200px;
+}
