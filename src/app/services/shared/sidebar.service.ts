@@ -31,9 +31,9 @@ export class SidebarService {
       titulo: 'Informes',
       icono: 'mdi mdi-cloud-print-outline',
       submenu: [
-        { titulo: 'OT',      url: '/infot'   },
-        { titulo: 'Acopios', url: '/infaco'  },
-        { titulo: 'Picking', url: '/infpick' },
+        { titulo: 'OT',          url: '/infot'   },
+        { titulo: 'Acopios',     url: '/infaco'  },
+        { titulo: 'Encomiendas', url: '/infpick' },
       ]
     }
   ];

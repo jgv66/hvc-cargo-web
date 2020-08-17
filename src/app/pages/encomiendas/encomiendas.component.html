@@ -1,11 +1,10 @@
 <nav>
     <div class="nav nav-tabs" id="nav-tab" role="tablist">
-        <a class="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#nav-contact" role="tab" aria-controls="nav-contact" aria-selected="false"><b>Encomiendas</b></a>
-        <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true"><b>Retiros</b></a>
-        <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false"><b>Acopios</b></a>
-        <a class="nav-item nav-link" id="nav-follow-tab" data-toggle="tab" href="#nav-follow" role="tab" aria-controls="nav-seguimiento" aria-selected="false"><b>Seguimientos</b></a>
+        <a class="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#nav-contact" role="tab" aria-controls="nav-contact" aria-selected="false"><b>Nueva Encomienda</b></a>
         <a class="nav-item nav-link" id="nav-cliente-tab" data-toggle="tab" href="#nav-cliente" role="tab" aria-controls="nav-ccliente" aria-selected="false"><b>Clientes</b></a>
-        <!-- <a class="nav-item nav-link" id="nav-datatables" data-toggle="tab" href="#nav-datatable" role="tab" aria-controls="nav-datatables" aria-selected="false"><b>DataTables</b></a> -->
+        <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true"><b>Pendientes de Transportar</b></a>
+        <a class="nav-item nav-link" id="nav-follow-tab" data-toggle="tab" href="#nav-follow" role="tab" aria-controls="nav-seguimiento" aria-selected="false"><b>Seguimientos</b></a>
+        <a class="nav-item nav-link" id="nav-busquedas-tab" data-toggle="tab" href="#nav-busquedas" role="tab" aria-controls="nav-busquedas" aria-selected="false"><b>Buscar Encomiendas</b></a>
     </div>
 </nav>
 <div class="tab-content" id="nav-tabContent">
@@ -141,252 +140,320 @@
     <!-- Retiros -->
     <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
         <!-- sector de retiro -->
-        <button type="button" class="btn btn-link text-right" (click)="cargarDatosPendientes()" style="position: absolute;float: right;right: 26px;top: 140px;">
-            <i class="mdi mdi-refresh mdi-36px"></i>
-        </button>
-        <div classs="card" style="margin-top: 5px;">
-            <div class="progress" *ngIf=" buscandoRetiros ">
-                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;height: 5px;"></div>
+        <div class="progress" *ngIf=" buscandoRetiros ">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;height: 5px;"></div>
+        </div>
+        <div class="mat-elevation-z8">
+            <div class="form-row mt-2 mb-2">
+                <div class="col-4" *ngIf=" filasRetiro > 0 " style="margin-top:10px">
+                    <mat-form-field appearance="" style="margin-left: 15px;width:350px">
+                        <mat-label>Filtrar</mat-label>
+                        <input matInput (keyup)="aplicarFiltroRetiro( $event )" name="filtroRetiro" [(ngModel)]="filtro" placeholder="digite algo..." #input>
+                        <button mat-button *ngIf=" filtro !== '' " matSuffix mat-icon-button aria-label="Clear" (click)=" filtro = '' ">
+                            <mat-icon>close</mat-icon>
+                        </button>
+                    </mat-form-field>
+                </div>
+                <div class="col-2" style="max-height: 50px; height: 50px;">
+                    <button type="button" class="btn btn-link text-right" (click)="cargarDatosPendientes()">
+                        <i class="mdi mdi-refresh mdi-36px"></i>
+                    </button>
+                </div>
             </div>
-            <table class="table table-striped table-hover table-sm">
-                <thead class="bg-dark text-light">
-                    <tr translate="no">
-                        <th scope="col" style="width:370px;">#Seguimiento / Cliente</th>
-                        <th scope="col" style="width:320px;">Destinatario</th>
-                        <th scope="col" style="width:150px;">Encomienda</th>
-                        <th scope="col" style="width:150px;">Fechas</th>
-                        <th scope="col" style="width:150px;">Cobro</th>
-                        <th scope="col" style="width:200px;">Estado</th>
-                        <th scope="col" style="width:150px;text-align:center;">Acción</th>
-                    </tr>
-                </thead>
-                <tbody translate="no" class="text-dark fuente75">
-                    <tr *ngFor="let item of retiros">
-                        <td colspan="7" style="width:100%">
-                            <table style="width:100%; border-collapse: none !important; border-spacing: 0px!important;">
+            <table mat-table class="mat-table al100" [dataSource]="dsRetiros" style="margin-top: -20px;">
+
+                <ng-container matColumnDef="id_paquete">
+                    <mat-header-cell *matHeaderCellDef style="max-width: 100px;width: 100px;"> #Id </mat-header-cell>
+                    <mat-cell *matCellDef="let element" style="max-width: 100px;width: 100px;"><b> #{{element.id_paquete}} </b></mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="fecha_creacion">
+                    <mat-header-cell *matHeaderCellDef style="max-width: 150px;width: 150px;">Fecha Creación</mat-header-cell>
+                    <mat-cell *matCellDef="let element" style="max-width: 150px;width: 150px;"> {{element.fecha_creacion}} </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="obs_carga">
+                    <mat-header-cell *matHeaderCellDef style="max-width: 150px;width: 150px;"> Encomienda </mat-header-cell>
+                    <mat-cell *matCellDef="let element" style="max-width: 150px;width: 150px;"> {{element.obs_carga}} </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="cli_razon">
+                    <mat-header-cell *matHeaderCellDef style="max-width: 430px;width: 430px;"> Cliente </mat-header-cell>
+                    <mat-cell *matCellDef="let element" style="max-width: 430px;width: 430px;"> {{element.cli_razon}} </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="des_razon">
+                    <mat-header-cell *matHeaderCellDef style="max-width: 400px;width: 400px;"> Destinatario </mat-header-cell>
+                    <mat-cell *matCellDef="let element" style="max-width: 400px;width: 400px;"> {{element.des_razon}} </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="tipo_pago">
+                    <mat-header-cell *matHeaderCellDef style="max-width: 180px;width: 180px;"> Cobro </mat-header-cell>
+                    <mat-cell *matCellDef="let element" style="max-width: 180px;width: 180px;font-weight: bold; color: red"> {{element.tipo_pago}} </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="estado">
+                    <mat-header-cell *matHeaderCellDef style="max-width: 200px;width: 200px;"> Estado </mat-header-cell>
+                    <mat-cell *matCellDef="let element" style="max-width: 200px;width: 200px;"> {{element.estado}} </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="acciones">
+                    <mat-header-cell *matHeaderCellDef> Acciones </mat-header-cell>
+                    <mat-cell *matCellDef="let item">
+                        <a *ngIf=" login.usuario.admin " (click)="revisarEncomienda( item )" data-toggle="modal" data-target="#EditEncomienda" class="has-arrow waves-effect text-dark" style="margin-top:10px;">
+                            <i class="mdi mdi-lead-pencil mdi-24px"></i>
+                        </a>&nbsp;
+                        <a *ngIf=" login.usuario.admin " (click)="cambiodeEstado( item )" data-toggle="modal" data-target="#EditEstados" class="has-arrow waves-effect text-dark" style="margin-top:10px;">
+                            <i class="mdi mdi-checkbox-marked-circle-outline mdi-24px "></i>
+                        </a>&nbsp;
+                        <a *ngIf=" login.usuario.admin " (click)="borrarEncomienda( item )" class="has-arrow waves-effect text-dark" style="margin-top:10px;color:red;">
+                            <i class="mdi mdi-delete mdi-24px "></i>
+                        </a>
+                    </mat-cell>
+                </ng-container>
+
+                <ng-container matColumnDef="detalleRetiros">
+                    <mat-cell *matCellDef="let detail" [attr.colspan]="dispColumns.length">
+                        <table class="table table-striped table-hover table-sm">
+                            <tbody translate="no">
                                 <tr>
-                                    <td style="padding-top: 18px;width:370px;" scope="row">
-                                        <p> <a data-toggle="collapse" href="#id-{{item.id_paquete}}" role="button" aria-expanded="false" aria-controls="collapseExample">( <b>#{{item.id_paquete}}</b> )</a> {{item.cli_razon}}</p>
+                                    <td scope="row" style="width: 69px;"></td>
+                                    <td scope="row" style="width: 150px;">
+                                        <p><i class="mdi mdi-clock-fast mdi-18px"></i> {{ detail.element.hora_creacion }}</p>
+                                        <p><i class="mdi mdi-calendar-question mdi-18px"></i> {{ detail.element.fecha_prometida }}</p>
                                     </td>
-                                    <td style="padding-top: 18px;width:320px;" scope="row">
-                                        <p>{{ item.des_razon }}</p>
+                                    <td scope="row" style="width: 150px;">
+                                        <p><i class="mdi mdi-package-variant-closed mdi-18px"></i> {{ detail.element.bultos }} </p>
+                                        <p><i class="mdi mdi-weight-kilogram mdi-18px"></i> {{ detail.element.peso | number:"1.0-2" }}Kg </p>
                                     </td>
-                                    <td style="padding-top: 18px;width:150px;" scope="row">
-                                        <p>{{ item.obs_carga }}</p>
+                                    <td scope="row" style="width: 300px;">
+                                        <p>{{ detail.element.cli_direccion }}, {{ detail.element.cli_comuna}} </p>
+                                        <p>{{ detail.element.contacto }}</p>
+                                        <p>{{ detail.element.cli_referencias }}</p>
                                     </td>
-                                    <td style="padding-top: 18px;width:150px;" scope="row">
-                                        <p><i class="mdi mdi-calendar-clock mdi-18px"></i> {{ item.fecha_creacion }}</p>
+                                    <td scope="row" style="width: 310px;">
+                                        <p style="margin-left: 5px;">{{ detail.element.des_direccion }}, {{ detail.element.des_comuna}} </p>
                                     </td>
-                                    <td style="padding-top: 18px;width:150px; font-weight: bold; color: red" scope="row">
-                                        <p>{{ item.tipo_pago }}</p>
+                                    <td style="max-width: 180px;width: 180px;padding-top: 18px; font-weight: bold; color: red" scope="row">
+                                        <p>${{ detail.element.valor_cobrado | number:"1.0-0"}}</p>
                                     </td>
-                                    <td style="padding-top: 18px;width:200px;" scope="row">
-                                        <p><i class="mdi mdi-comment-question-outline mdi-18px"></i> {{ item.estado }}</p>
-                                    </td>
-                                    <td class="text-center" style="width:150px;">
-                                        <a *ngIf=" login.usuario.admin " (click)="revisarEncomienda( item )" data-toggle="modal" data-target="#EditEncomienda" class="has-arrow waves-effect text-dark" style="margin-top:10px;">
-                                            <i class="mdi mdi-lead-pencil mdi-24px"></i>
-                                        </a>&nbsp;
-                                        <a *ngIf=" login.usuario.admin " (click)="cambiodeEstado( item )" data-toggle="modal" data-target="#EditEstados" class="has-arrow waves-effect text-dark" style="margin-top:10px;">
-                                            <i class="mdi mdi-checkbox-marked-circle-outline mdi-24px "></i>
-                                        </a>&nbsp;
-                                        <a *ngIf=" login.usuario.admin " (click)="borrarEncomienda( item )" class="has-arrow waves-effect text-dark" style="margin-top:10px;">
-                                            <i class="mdi mdi-delete mdi-24px "></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                <tr class="collapse" id="id-{{item.id_paquete}}">
-                                    <td scope="row">
-                                        <p>{{ item.cli_direccion }}, {{ item.cli_comuna}} </p>
-                                        <p>{{ item.contacto }}</p>
-                                        <p>{{ item.cli_referencias }}</p>
-                                    </td>
-                                    <td scope="row">
-                                        <p>{{ item.des_direccion }}, {{ item.des_comuna}} </p>
-                                    </td>
-                                    <td scope="row">
-                                        <p><i class="mdi mdi-package-variant-closed mdi-18px"></i> {{ item.bultos }} </p>
-                                        <p><i class="mdi mdi-weight-kilogram mdi-18px"></i> {{ item.peso | number:"1.0-2" }}Kg </p>
-                                    </td>
-                                    <td scope="row">
-                                        <p><i class="mdi mdi-clock-fast mdi-18px"></i> {{ item.hora_creacion }}</p>
-                                        <p><i class="mdi mdi-calendar-question mdi-18px"></i> {{ item.fecha_prometida }}</p>
-                                    </td>
-                                    <td style="padding-top: 18px; font-weight: bold; color: red" scope="row">
-                                        <p>${{ item.valor_cobrado | number:"1.0-0"}}</p>
-                                    </td>
-                                    <td scope="row">
-                                        <p><i class="mdi mdi-calendar-clock mdi-18px"></i> {{ item.asignacion }}</p>
-                                        <p><i class="mdi mdi-clock-fast mdi-18px"></i> {{ item.hora_asignacion }}</p>
-                                        <p><i class="mdi mdi-account-settings mdi-18px"></i> {{ item.pickeador }}</p>
+                                    <td scope="row" style="max-width: 180px;width: 180px;">
+                                        <p><i class="mdi mdi-calendar-clock mdi-18px"></i> {{ detail.element.asignacion }}</p>
+                                        <p><i class="mdi mdi-clock-fast mdi-18px"></i> {{ detail.element.hora_asignacion }}</p>
+                                        <p><i class="mdi mdi-account-settings mdi-18px"></i> {{ detail.element.pickeador }}</p>
                                     </td>
                                     <td class="text-center">
                                     </td>
                                 </tr>
-                            </table>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-    <!-- Acopios -->
-    <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
-        <!-- sector de acopios -->
-        <button type="button" class="btn btn-link text-right" (click)="cargarDatosAcopio()" style="position: absolute;float: right;right: 26px;top: 140px;">
-            <i class="mdi mdi-refresh mdi-36px"></i>
-        </button>
+                            </tbody>
+                        </table>
+                    </mat-cell>
+                </ng-container>
 
-        <div classs="card" style="margin-top: 5px;">
-            <table class="table table-striped table-hover table-sm">
-                <thead class="bg-success text-light">
-                    <tr translate="no">
-                        <th scope="col" style="width:300px;">#Seguimiento / Cliente</th>
-                        <th scope="col" style="width:360px;">Destinatario</th>
-                        <th scope="col" style="width:180px;">Encomienda</th>
-                        <th scope="col" style="width:150px;">Fechas</th>
-                        <th scope="col" style="width:150px;">Cobro</th>
-                        <th scope="col" style="width:200px;">Estado</th>
-                        <th scope="col" style="width:150px;text-align:center;">Acción</th>
-                    </tr>
-                </thead>
-                <tbody translate="no" class="text-dark fuente75">
-                    <tr *ngFor="let item of acopios">
-                        <td colspan="7" style="width:100%">
-                            <table style="width:100%; border-collapse: none !important; border-spacing: 0px!important;">
-                                <!-- parte superior -->
-                                <tr>
-                                    <td style="padding-top: 18px; width:300px;" scope="row">
-                                        <p>
-                                            <a data-toggle="collapse" href="#id-{{item.id_paquete}}" role="button" aria-expanded="false" aria-controls="collapseExample">
-                                                ( <b>#{{item.id_paquete}}</b> )
-                                            </a> {{item.cli_razon}}
-                                        </p>
-                                    </td>
-                                    <td style="padding-top: 18px;width:360px;" scope="row">
-                                        <p>{{ item.des_razon }}</p>
-                                    </td>
-                                    <td style="padding-top: 18px;width:180px;" scope="row">
-                                        <p>{{ item.obs_carga }}</p>
-                                    </td>
-                                    <td style="padding-top: 18px;width:150px;" scope="row">
-                                        <p><i class="mdi mdi-calendar-clock mdi-18px"></i> {{ item.fecha_creacion }}</p>
-                                    </td>
-                                    <td style="padding-top: 18px; font-weight: bold; color: red; width:150px;" scope="row">
-                                        <p>{{ item.tipo_pago }}</p>
-                                    </td>
-                                    <td style="padding-top: 18px;width:200px;" scope="row">
-                                        <p><i class="mdi mdi-comment-question-outline mdi-18px"></i> {{ item.estado }}</p>
-                                    </td>
-                                    <td class="text-center" style="width:150px;">
-                                        <a (click)="cargarFoto( item )" data-toggle="modal" data-target="#exampleModal" class="has-arrow waves-effect text-dark" style="margin-top: 10px;">
-                                            <i class="mdi mdi-camera mdi-24px"></i>
-                                        </a>&nbsp;
-                                        <a *ngIf=" login.usuario.admin " (click)="revisarEncomienda( item )" data-toggle="modal" data-target="#EditEncomienda" class="has-arrow waves-effect text-dark" style="margin-top:10px;">
-                                            <i class="mdi mdi-lead-pencil mdi-24px"></i>
-                                        </a>&nbsp;
-                                        <a *ngIf=" login.usuario.admin " (click)="borrarEncomienda( item )" class="has-arrow waves-effect text-dark" style="margin-top: 10px;">
-                                            <i class="mdi mdi-delete-circle mdi-24px"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                                <tr class="collapse" id="id-{{item.id_paquete}}">
-                                    <td scope="row">
-                                        <p>{{ item.cli_direccion }}, {{ item.cli_comuna}} </p>
-                                        <p>{{ item.contacto }}</p>
-                                        <p>{{ item.cli_referencias }}</p>
-                                    </td>
-                                    <td scope="row">
-                                        <p>{{ item.des_direccion }}, {{ item.des_comuna}} </p>
-                                    </td>
-                                    <td scope="row">
-                                        <p><i class="mdi mdi-package-variant-closed mdi-18px"></i> {{ item.bultos }} </p>
-                                        <p><i class="mdi mdi-weight-kilogram mdi-18px"></i> {{ item.peso | number:"1.0-2" }}Kg </p>
-                                    </td>
-                                    <td scope="row">
-                                        <p><i class="mdi mdi-clock-fast mdi-18px"></i> {{ item.hora_creacion }}</p>
-                                        <p><i class="mdi mdi-calendar-question mdi-18px"></i> {{ item.fecha_prometida }}</p>
-                                    </td>
-                                    <td scope="row" style="font-weight: bold; color: red;">
-                                        <p>${{ item.valor_cobrado | number:"1.0-0"}}</p>
-                                    </td>
-                                    <td scope="row">
-                                        <p><i class="mdi mdi-calendar-clock mdi-18px"></i> {{ item.asignacion }}</p>
-                                        <p><i class="mdi mdi-clock-fast mdi-18px"></i> {{ item.hora_asignacion }}</p>
-                                        <p><i class="mdi mdi-account-settings mdi-18px"></i> {{ item.pickeador }}</p>
-                                    </td>
-                                    <td>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-                </tbody>
+                <mat-header-row *matHeaderRowDef="dispColumns"></mat-header-row>
+                <mat-row *matRowDef="let row; columns: dispColumns;" class="element-row" [class.expanded]="expandedElementR == row" (click)="expandedElementR = row"></mat-row>
+                <mat-row *matRowDef="let row; columns: ['detalleRetiros']; when: isExpansionDetailRowR" [@detailExpand]="row.element == expandedElementR ? 'expanded' : 'collapsed'" style="overflow: hidden"></mat-row>
             </table>
+
         </div>
+        <mat-paginator [hidePageSize]="true" [length]="filasRetiro" [pageSize]="(filasRetiro>7)?16:filasRetiro*2" [pageSizeOptions]="[16, 32, 64]" showFirstLastButtons></mat-paginator>
     </div>
     <!-- clientes -->
     <div class="tab-pane fade" id="nav-cliente" role="tabpanel" aria-labelledby="nav-cliente-tab">
         <div classs="card" style="margin-top: 5px;">
             <!-- buscar clientes -->
             <form (ngSubmit)="buscarClientes()">
-                <div class="form-row mt-2">
-                    <div class="col-8">
-                        <label class="col-2 col-form-label text-left">Buscar cliente</label>
-                        <input class="col-10 form-control" type="text" name="nombreorut" [(ngModel)]="nombreorut" placeholder="digite algo del nombre o rut...">
+                <div class="form-row mt-2 mb-2">
+                    <div class="col-4" style="padding-left: 20px;">
+                        <mat-form-field appearance="" style="max-height:50px;height:50px;width:350px">
+                            <mat-label>Buscar Clientes</mat-label>
+                            <input matInput placeholder="digite algo del nombre o rut..." name="nombreorut" [(ngModel)]="nombreorut">
+                            <button mat-button *ngIf="nombreorut" matSuffix mat-icon-button aria-label="Clear" (click)="nombreorut=''">
+                                <mat-icon>close</mat-icon>
+                            </button>
+                        </mat-form-field>
                     </div>
-                    <div class="col-1">
-                        <button type="submit" class="btn btn-outline-dark mb-2">Buscar</button>
+                    <div class="col-1" style="max-height: 50px; height: 50px;">
+                        <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Buscar</button>
                     </div>
-                    <button type="button" class="btn btn-link text-right" style="padding-top: 0px;" (click)="limpiar()">
-                        <i class="mdi mdi-refresh mdi-36px"></i>
-                    </button>
-                    <button type="button" class="btn btn-link text-right" style="padding-top: 0px;" (click)="crearCliente()" data-toggle="modal" data-target="#ModalCenteredCrear">
+                    <button class="col-1" type="button" class="btn btn-link text-right" style="padding-top: 0px;margin-top: 10px;" (click)="crearCliente()" data-toggle="modal" data-target="#ModalCenteredCrear">
                         <i class="mdi mdi-plus-circle-outline mdi-36px"></i>
                     </button>
+                </div>
+            </form>
+
+            <div class="progress" *ngIf=" buscando ">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;height: 5px;"></div>
+            </div>
+            <div class="mat-elevation-z8">
+                <table mat-table class="mat-table" [dataSource]="dsClientes">
+                    <ng-container matColumnDef="rut">
+                        <mat-header-cell *matHeaderCellDef style="max-width: 200px;width: 200px;"> Rut </mat-header-cell>
+                        <mat-cell *matCellDef="let element" style="max-width: 200px;width: 200px;"><b> {{element.rut}} </b></mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="razon_social">
+                        <mat-header-cell *matHeaderCellDef style="max-width: 400px;width: 400px;"> Razon Social / Nombre Fantasía </mat-header-cell>
+                        <mat-cell *matCellDef="let element" style="max-width: 400px;width: 400px;"> {{element.razon_social}} - {{ element.nombre_fantasia }}</mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="direccion">
+                        <mat-header-cell *matHeaderCellDef style="max-width: 600px;width: 600px;"> Direccion </mat-header-cell>
+                        <mat-cell *matCellDef="let element" style="max-width: 600px;width: 600px;"> {{element.direccion}} - {{ element.comuna }} </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="telefono1">
+                        <mat-header-cell *matHeaderCellDef style="max-width: 300px;width: 300px;"> Teléfonos </mat-header-cell>
+                        <mat-cell *matCellDef="let element" style="max-width: 300px;width: 300px;"> {{element.telefono1}} - {{element.telefono2}} </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="email">
+                        <mat-header-cell *matHeaderCellDef style="max-width: 300px;width: 300px;"> Email </mat-header-cell>
+                        <mat-cell *matCellDef="let element" style="max-width: 300px;width: 300px;"> {{element.email}} </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="acciones">
+                        <mat-header-cell *matHeaderCellDef> Acciones </mat-header-cell>
+                        <mat-cell *matCellDef="let item">
+                            <a (click)="editarCliente( item )" data-toggle="modal" data-target="#ModalCenteredCrear" class="has-arrow waves-effect text-dark" style="margin-top:10px;"><i class="mdi mdi-lead-pencil mdi-24px"></i></a>
+                        </mat-cell>
+                    </ng-container>
+                    <mat-header-row *matHeaderRowDef="dispColClientes"></mat-header-row>
+                    <mat-row *matRowDef="let row; columns: dispColClientes;"></mat-row>
+                </table>
+                <mat-paginator [hidePageSize]="true" [length]="filasClientes" [pageSize]="(filasClientes>10) ? 20 : filasClientes*2" [pageSizeOptions]="[20, 40, 100]" showFirstLastButtons></mat-paginator>
+            </div>
+
+        </div>
+    </div>
+    <!-- busquedas -->
+    <div class="tab-pane fade" id="nav-busquedas" role="tabpanel" aria-labelledby="nav-busquedas-tab">
+        <div classs="card" style="margin-top: 5px;">
+            <form (ngSubmit)="buscarPaquetes()">
+                <div class="form-row mt-2 mb-2">
+                    <div class="col-2" style="padding-left: 20px;">
+                        <mat-form-field color="accent" appearance="" style="max-height: 50px; height: 50px;">
+                            <mat-label>Fecha inicial</mat-label>
+                            <input matInput [matDatepicker]="picker" name="fechaIni" [(ngModel)]="fechaIni">
+                            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                            <mat-datepicker #picker></mat-datepicker>
+                        </mat-form-field>
+                    </div>
+                    <div class="col-2">
+                        <mat-form-field color="accent" appearance="" style="max-height: 50px; height: 50px;">
+                            <mat-label>Fecha final</mat-label>
+                            <input matInput [matDatepicker]="picker2" name="fechaFin" [(ngModel)]="fechaFin">
+                            <mat-datepicker-toggle matSuffix [for]="picker2"></mat-datepicker-toggle>
+                            <mat-datepicker #picker2></mat-datepicker>
+                        </mat-form-field>
+                    </div>
+                    <div class="col-2" style="max-height: 50px; height: 50px;">
+                        <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Buscar Encomiendas</button>
+                    </div>
+                    <div class="col-4" *ngIf=" retiros?.length > 0 ">
+                        <mat-form-field *ngIf=" retiros?.length > 0 ">
+                            <mat-label>Filtrar</mat-label>
+                            <input matInput (keyup)="aplicarFiltroBusquedasB( $event )" placeholder="digite algo..." #input>
+                        </mat-form-field>
+                    </div>
                 </div>
             </form>
             <div class="progress" *ngIf=" buscando ">
                 <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;height: 5px;"></div>
             </div>
+            <!-- <app-mattableencomiendas [dataSource]="dsBusquedas" [filas]="filasBusqueda"></app-mattableencomiendas> -->
+            <div class="mat-elevation-z8">
+                <table mat-table class="mat-table" [dataSource]="dsBusquedas">
 
-            <!-- grilla de clientes -->
-            <table class="table table-striped table-sm">
-                <thead class="bg-dark text-light">
-                    <tr translate="no">
-                        <th scope="col" style="width:100px;">RUT</th>
-                        <th scope="col" style="width:350px;">Razon Social / Nombre Fantasía</th>
-                        <th scope="col" style="width:400px;">Direccion / Comuna</th>
-                        <th scope="col" style="width:150px;">Teléfonos</th>
-                        <th scope="col" style="width:200px;">Email</th>
-                        <th scope="col" style="width:100px;text-align:center;">Acción</th>
-                    </tr>
-                </thead>
-                <tbody translate="no" class="text-dark fuente75">
-                    <tr *ngFor="let item of clientes">
-                        <td style="padding-top: 18px;" scope="row">
-                            <p>{{item.rut}}</p>
-                        </td>
-                        <td style="padding-top: 18px;" scope="row">
-                            <p>{{ item.razon_social }}</p>
-                            <p>{{ item.nombre_fantasia }}</p>
-                        </td>
-                        <td style="padding-top: 18px;" scope="row">
-                            <p>{{ item.direccion }}</p>
-                            <p>{{ item.comuna }}</p>
-                        </td>
-                        <td style="padding-top: 18px;" scope="row">
-                            <p>{{ item.telefono1 }} - {{ item.telefono2 }}</p>
-                        </td>
-                        <td style="padding-top: 18px;" scope="row">
-                            <p>{{ item.email }}</p>
-                        </td>
-                        <td class="text-center">
-                            <a (click)="editarCliente( item )" data-toggle="modal" data-target="#ModalCenteredCrear" class="has-arrow waves-effect text-dark" style="margin-top:10px;"><i class="mdi mdi-lead-pencil mdi-24px"></i></a>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                    <!-- Position Column -->
+                    <ng-container matColumnDef="id_paquete">
+                        <mat-header-cell *matHeaderCellDef style="max-width: 200px;width: 100px;"> #Id </mat-header-cell>
+                        <mat-cell *matCellDef="let element" style="max-width: 100px;width: 100px;"><b> #{{element.id_paquete}} </b></mat-cell>
+                    </ng-container>
+
+                    <!-- Name Column -->
+                    <ng-container matColumnDef="fecha_creacion">
+                        <mat-header-cell *matHeaderCellDef style="max-width: 150px;width: 150px;">Fecha Creación
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let element" style="max-width: 150px;width: 150px;"> {{element.fecha_creacion}} </mat-cell>
+                    </ng-container>
+
+                    <ng-container matColumnDef="obs_carga">
+                        <mat-header-cell *matHeaderCellDef style="max-width: 150px;width: 150px;"> Encomienda </mat-header-cell>
+                        <mat-cell *matCellDef="let element" style="max-width: 150px;width: 150px;"> {{element.obs_carga}} </mat-cell>
+                    </ng-container>
+
+                    <!-- Weight Column -->
+                    <ng-container matColumnDef="cli_razon">
+                        <mat-header-cell *matHeaderCellDef style="max-width: 400px;width: 400px;"> Cliente </mat-header-cell>
+                        <mat-cell *matCellDef="let element" style="max-width: 400px;width: 400px;"> {{element.cli_razon}} </mat-cell>
+                    </ng-container>
+
+                    <ng-container matColumnDef="des_razon">
+                        <mat-header-cell *matHeaderCellDef style="max-width: 400px;width: 400px;"> Destinatario </mat-header-cell>
+                        <mat-cell *matCellDef="let element" style="max-width: 400px;width: 400px;"> {{element.des_razon}} </mat-cell>
+                    </ng-container>
+
+                    <ng-container matColumnDef="tipo_pago">
+                        <mat-header-cell *matHeaderCellDef style="max-width: 180px;width: 180px;"> Cobro </mat-header-cell>
+                        <mat-cell *matCellDef="let element" style="max-width: 180px;width: 180px;font-weight: bold; color: red"> {{element.tipo_pago}} </mat-cell>
+                    </ng-container>
+
+                    <ng-container matColumnDef="estado">
+                        <mat-header-cell *matHeaderCellDef style="max-width: 200px;width: 200px;"> Estado </mat-header-cell>
+                        <mat-cell *matCellDef="let element" style="max-width: 200px;width: 200px;"> {{element.estado}} </mat-cell>
+                    </ng-container>
+
+                    <ng-container matColumnDef="acciones">
+                        <mat-header-cell *matHeaderCellDef> Acciones </mat-header-cell>
+                        <mat-cell *matCellDef="let item">
+                            <a *ngIf=" login.usuario.admin " (click)="revisarEncomienda( item )" data-toggle="modal" data-target="#EditEncomienda" class="has-arrow waves-effect text-dark" style="margin-top:10px;">
+                                <i class="mdi mdi-lead-pencil mdi-24px"></i>
+                            </a>&nbsp;
+                            <a *ngIf=" login.usuario.admin " (click)="cambiodeEstado( item )" data-toggle="modal" data-target="#EditEstados" class="has-arrow waves-effect text-dark" style="margin-top:10px;">
+                                <i class="mdi mdi-checkbox-marked-circle-outline mdi-24px "></i>
+                            </a>&nbsp;
+                            <a *ngIf=" login.usuario.admin " (click)="borrarEncomienda( item )" class="has-arrow waves-effect text-dark" style="margin-top:10px;color:red;">
+                                <i class="mdi mdi-delete mdi-24px "></i>
+                            </a>
+                        </mat-cell>
+                    </ng-container>
+
+                    <!-- Expanded Content Column - The detail row is made up of this one column -->
+                    <ng-container matColumnDef="expandedDetail">
+                        <mat-cell *matCellDef="let detail">
+                            <table class="table table-striped table-hover table-sm">
+                                <tbody translate="no">
+                                    <tr>
+                                        <td scope="row" style="width: 69px;"></td>
+                                        <td scope="row" style="width: 150px;">
+                                            <p><i class="mdi mdi-clock-fast mdi-18px"></i> {{ detail.element.hora_creacion }}</p>
+                                            <p><i class="mdi mdi-calendar-question mdi-18px"></i> {{ detail.element.fecha_prometida }}</p>
+                                        </td>
+                                        <td scope="row" style="width: 150px;">
+                                            <p><i class="mdi mdi-package-variant-closed mdi-18px"></i> {{ detail.element.bultos }} </p>
+                                            <p><i class="mdi mdi-weight-kilogram mdi-18px"></i> {{ detail.element.peso | number:"1.0-2" }}Kg </p>
+                                        </td>
+                                        <td scope="row" style="width: 270px;">
+                                            <p>{{ detail.element.cli_direccion }}, {{ detail.element.cli_comuna}} </p>
+                                            <p>{{ detail.element.contacto }}</p>
+                                            <p>{{ detail.element.cli_referencias }}</p>
+                                        </td>
+                                        <td scope="row" style="width: 270px;">
+                                            <p>{{ detail.element.des_direccion }}, {{ detail.element.des_comuna}} </p>
+                                        </td>
+                                        <td style="max-width: 180px;width: 180px;padding-top: 18px; font-weight: bold; color: red" scope="row">
+                                            <p>${{ detail.element.valor_cobrado | number:"1.0-0"}}</p>
+                                        </td>
+                                        <td scope="row" style="max-width: 180px;width: 180px;">
+                                            <p><i class="mdi mdi-calendar-clock mdi-18px"></i> {{ detail.element.asignacion }}</p>
+                                            <p><i class="mdi mdi-clock-fast mdi-18px"></i> {{ detail.element.hora_asignacion }}</p>
+                                            <p><i class="mdi mdi-account-settings mdi-18px"></i> {{ detail.element.pickeador }}</p>
+                                        </td>
+                                        <td class="text-center">
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </mat-cell>
+                    </ng-container>
+
+                    <mat-header-row *matHeaderRowDef="dispColumns"></mat-header-row>
+                    <mat-row *matRowDef="let row; columns: dispColumns;" matRipple class="element-row" [class.expanded]="expandedElementB == row" (click)="expandedElement = row"></mat-row>
+                    <mat-row *matRowDef="let row; columns: ['expandedDetail']; when: isExpansionDetailRowB" [@detailExpand]="row.element == expandedElementB ? 'expanded' : 'collapsed'" style="overflow: hidden"></mat-row>
+
+                </table>
+
+                <mat-paginator [hidePageSize]="true" [length]="filasBusqueda" [pageSize]="20" [pageSizeOptions]="[20, 40, 100]" showFirstLastButtons></mat-paginator>
+            </div>
         </div>
     </div>
     <!-- seguimientos -->
@@ -394,53 +461,53 @@
         <div classs="card" style="margin-top: 5px;">
             <!-- buscar paquete -->
             <form (ngSubmit)="buscarPaquete()">
-                <div class="form-row mt-2">
-                    <div class="col-6">
-                        <label class="col-3 col-form-label text-left">Encomienda #</label>
-                        <input class="col-4 form-control" type="text" name="idpqt" [(ngModel)]="idpqt" placeholder="digite el ID de seguimiento...">
-                        <button type="submit" class="btn btn-outline-dark mb-2" style="padding-top:7px; margin-top: 5px; margin-left: 10px;">Buscar</button>
+                <div class="form-row mt-2 mb-2">
+                    <div class="col-2" style="padding-left: 20px;">
+                        <mat-form-field color="accent" appearance="" style="max-height: 50px; height: 50px;width:300px">
+                            <mat-label>#Encomienda</mat-label>
+                            <input matInput name="idpqt" [(ngModel)]="idpqt" placeholder="digite el ID de seguimiento...">
+                            <button mat-button *ngIf="idpqt" matSuffix mat-icon-button aria-label="Clear" (click)="idpqt=''">
+                                <mat-icon>close</mat-icon>
+                            </button>
+                        </mat-form-field>
                     </div>
-                    <div class="col-1">
+                    <div class="col-2" style="max-height: 50px; height: 50px;">
+                        <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Buscar</button>
                     </div>
                 </div>
             </form>
             <div class="progress" *ngIf=" buscandoID ">
                 <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;height: 5px;"></div>
             </div>
-
-            <!-- grilla de clientes -->
-            <table class="table table-striped table-sm">
-                <thead class="bg-dark text-light">
-                    <tr translate="no">
-                        <th scope="col" style="width:150px;">#Seguimiento</th>
-                        <th scope="col" style="width:150px;">Fecha</th>
-                        <th scope="col" style="width:120px;">Hora</th>
-                        <th scope="col" style="width:300px;">Usuario</th>
-                        <th scope="col" style="width:350px;">Comentario</th>
-                    </tr>
-                </thead>
-                <tbody translate="no" class="text-dark fuente75">
-                    <tr *ngFor="let item of estadosPqt">
-                        <td style="padding-top: 18px;" scope="row">
-                            <p>{{item.id_paquete}}</p>
-                        </td>
-                        <td style="padding-top: 18px;" scope="row">
-                            <p>{{item.fecha}}</p>
-                        </td>
-                        <td style="padding-top: 18px;" scope="row">
-                            <p>{{ item.hora }}</p>
-                        </td>
-                        <td style="padding-top: 18px;" scope="row">
-                            <p>{{ item.nombre }}</p>
-                        </td>
-                        <td style="padding-top: 18px;" scope="row">
-                            <p>{{ item.comentario }}</p>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="mat-elevation-z8">
+                <table mat-table class="mat-table" [dataSource]="dsSeguimiento">
+                    <ng-container matColumnDef="id">
+                        <mat-header-cell *matHeaderCellDef> #Seguimiento </mat-header-cell>
+                        <mat-cell *matCellDef="let element"> #{{element.id_paquete}} </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="fecha">
+                        <mat-header-cell *matHeaderCellDef> Fecha creación </mat-header-cell>
+                        <mat-cell *matCellDef="let element"> {{element.fecha}} </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="hora">
+                        <mat-header-cell *matHeaderCellDef> Hora </mat-header-cell>
+                        <mat-cell *matCellDef="let element"> {{element.hora}} </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="usuario">
+                        <mat-header-cell *matHeaderCellDef> Usuario </mat-header-cell>
+                        <mat-cell *matCellDef="let element"> {{element.nombre}} </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="notas">
+                        <mat-header-cell *matHeaderCellDef> Comentarios </mat-header-cell>
+                        <mat-cell *matCellDef="let element"> {{element.comentario}} </mat-cell>
+                    </ng-container>
+                    <mat-header-row *matHeaderRowDef="dispColSeguimiento"></mat-header-row>
+                    <mat-row *matRowDef="let row; columns: dispColSeguimiento;"></mat-row>
+                </table>
+            </div>
         </div>
     </div>
+
 </div>
 
 <!-- Modal que despliega la foto -->
@@ -582,7 +649,7 @@
 </div>
 
 <!-- Modal crear/modificar cliente -->
-<div class="modal fade" id="ModalCenteredCrear" tabindex="-1" role="dialog" aria-labelledby="ModalCenteredCrearLabel" aria-hidden="true">
+<div class="modal fade" id="ModalCenteredCrear" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" aria-labelledby="ModalCenteredCrearLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content" style="width: 670px;">
             <div class="modal-header">
@@ -594,11 +661,11 @@
             <div class="modal-body">
                 <div class="row" style="margin-top: 10px;">
                     <div class="col-12" style="margin-top: 10px;">
-                        <label class="col-3 col-form-label">Rut</label>
+                        <label class="col-3 col-form-label">Rut (*)</label>
                         <input class="form-control col-9" type="text" name="xrut" [(ngModel)]="linea.rut">
                     </div>
                     <div class="col-12" style="margin-top: 10px;">
-                        <label class="col-3 col-form-label">Nombre</label>
+                        <label class="col-3 col-form-label">Nombre (*)</label>
                         <input class="form-control col-9" type="text" name="razon_social" [(ngModel)]="linea.razon_social">
                     </div>
                     <div class="col-12" style="margin-top: 10px;">
@@ -606,22 +673,22 @@
                         <input class="form-control col-9" type="text" name="razon_fantasia" [(ngModel)]="linea.nombre_fantasia">
                     </div>
                     <div class="col-12" style="margin-top: 10px;">
-                        <label class="col-3 col-form-label">Dirección</label>
+                        <label class="col-3 col-form-label">Dirección (*)</label>
                         <input class="form-control col-9" type="text" name="direccion" [(ngModel)]="linea.direccion">
                     </div>
                     <div class="col-12" style="margin-top: 10px;">
-                        <label class="col-3 col-form-label text-left">Comuna</label>
+                        <label class="col-3 col-form-label text-left">Comuna (*)</label>
                         <select class="form-control col-9 text-left" name="comuna" [(ngModel)]="linea.comuna">
                           <option value="">Seleccione una comuna</option>
                           <option *ngFor="let comu of login.ciudadesPermitidas" [value]="comu.ciudad">{{ comu.ciudad }}</option>
                         </select>
                     </div>
                     <div class="col-12" style="margin-top: 10px;">
-                        <label class="col-3 col-form-label">Teléfono (1)</label>
+                        <label class="col-3 col-form-label">Teléfono-1 (*)</label>
                         <input class="form-control col-9" type="text" name="telefono1" [(ngModel)]="linea.telefono1">
                     </div>
                     <div class="col-12" style="margin-top: 10px;">
-                        <label class="col-3 col-form-label">Teléfono (2)</label>
+                        <label class="col-3 col-form-label">Teléfono-2</label>
                         <input class="form-control col-9" type="text" name="telefono2" [(ngModel)]="linea.telefono2">
                     </div>
                     <div class="col-12" style="margin-top: 10px;">
@@ -635,8 +702,9 @@
                 </div>
             </div>
             <div class="modal-footer">
+                <div class="example-label">(*) Campos obligatorios</div>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="grabarCliente()">Grabar y actualizar</button>
+                <button type="button" class="btn btn-primary" (click)="grabarCliente()">Grabar y actualizar</button>
             </div>
         </div>
     </div>

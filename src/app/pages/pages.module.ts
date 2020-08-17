@@ -18,6 +18,8 @@ import { EditalineaComponent } from '../components/editalinea/editalinea.compone
 import { UsuariosComponent } from './usuarios/usuarios.component';
 import { EncomiendasComponent } from './encomiendas/encomiendas.component';
 import { OtComponent } from './ot/ot.component';
+import { InfpickComponent } from './infpick/infpick.component';
+import { ComponentsModule } from '../components/components.module';
 
 @NgModule({
     declarations: [
@@ -27,7 +29,8 @@ import { OtComponent } from './ot/ot.component';
         EditalineaComponent,
         UsuariosComponent,
         EncomiendasComponent,
-        OtComponent
+        OtComponent,
+        InfpickComponent,
     ],
     exports: [
         DashboardComponent,
@@ -41,6 +44,7 @@ import { OtComponent } from './ot/ot.component';
         FormsModule,
         ReactiveFormsModule,
         MaterialModule,
+        ComponentsModule
     ]
 })
 export class PagesModule { }

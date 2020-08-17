@@ -7,6 +7,10 @@ p {
     margin-bottom: 5px;
 }
 
+table {
+    width: 100%;
+}
+
 .sinBorde {
     border: 0;
     border-bottom: 0px solid #000;
@@ -24,4 +28,13 @@ select option {
     display: block;
     text-overflow: ellipsis;
     max-height: 200px;
+}
+
+mat-header-cell {
+    font-weight: bold;
+    background-color: #03a9f438;
+}
+
+mat-cell {
+    font-weight: black;
 }

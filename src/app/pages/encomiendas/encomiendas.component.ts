@@ -1,27 +1,62 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewChildren, AfterViewInit, QueryList } from '@angular/core';
 import { Router } from '@angular/router';
 import { StockService } from '../../services/stock.service';
 import { LoginService } from '../../services/login.service';
+import { GuiasService } from '../../services/guias.service';
+import { animate, state, style, transition, trigger } from '@angular/animations';
 
 // ES6 Modules or TypeScript
 import Swal from 'sweetalert2';
 
+import { MatPaginator } from '@angular/material/paginator';
+import { MatTableDataSource, MatSort } from '@angular/material';
+
 @Component({
   selector: 'app-encomiendas',
   templateUrl: './encomiendas.component.html',
-  styleUrls: ['./encomiendas.component.scss']
+  styleUrls: ['./encomiendas.component.scss'],
+  animations: [
+    trigger('detailExpand', [
+      state('collapsed', style({ height: '0px', minHeight: '0', visibility: 'hidden' })),
+      state('expanded', style({ height: '*', visibility: 'visible' })),
+      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+    ]),
+  ]
 })
 export class EncomiendasComponent implements OnInit {
+
+  @ViewChildren(MatPaginator) paginator = new QueryList<MatPaginator>();
+  @ViewChildren(MatSort) sort = new QueryList<MatSort>();
+
+  dsRetiros: MatTableDataSource<any>;
+  dsClientes: MatTableDataSource<any>;
+  dsBusquedas: MatTableDataSource<any>;
+  dsSeguimiento: MatTableDataSource<any>;
+
+  filasRetiro = 0;
+  filasClientes = 0;
+  filasBusqueda = 0;
+
+  dispColumns: string[] = ['id_paquete', 'fecha_creacion', 'obs_carga', 'cli_razon', 'des_razon', 'tipo_pago', 'estado', 'acciones'];
+  dispColClientes: string[] = ['rut', 'razon_social', 'direccion', 'telefono1', 'email', 'acciones'];
+  dispColSeguimiento: string[] = ['id', 'fecha', 'hora', 'usuario', 'notas'];
+
+  expandedElementR: any;
+  expandedElementC: any;
+
+  filtro = '';
 
   grabando = false;
   cargando = false;
   buscando = false;
   buscandoChico = false;
   buscandoRetiros = false;
+  busquedas = false;
   enProceso = false;
   grabandoEnco = false;
   retiros = [];
   encomienda = {};
+  poracopiar = [];
   acopios = [];
   clientes = [];
   linea: any = {};
@@ -41,121 +76,83 @@ export class EncomiendasComponent implements OnInit {
   buscarUsuario = '';
   cerrarPQT = false;
 
+  fechaIni = new Date();
+  fechaFin = new Date();
+
   constructor( private router: Router,
                public login: LoginService,
-               private stockSS: StockService ) { }
+               private stockSS: StockService,
+               private guias: GuiasService ) {}
 
   ngOnInit() {
     if ( !this.login.usuario ) {
       this.router.navigate(['/login']);
     }
     this.cargarDatosPendientes();
-    this.cargarDatosAcopio();
-    this.cargarDatosClientes();
+    // this.cargarDatosPorAcopiar();
+    // this.cargarDatosAcopio();
     this.initCarga();
   }
 
   cargarDatosPendientes( event? ) {
     this.cargando = true;
-    this.retiros  = [];
     this.buscandoRetiros = true;
     this.stockSS.servicioWEB( '/pickpend', { ficha: this.login.usuario.id, todos: '*' } )
         .subscribe( (dev: any) => {
             // console.log(dev);
             this.cargando = false;
             this.buscandoRetiros = false;
-            if ( dev.resultado === 'error' ) {
+            if ( dev.resultado === 'error' || dev.resultado === 'nodata' ) {
               Swal.fire('No existen retiros pendientes');
-            } else if ( dev.resultado === 'nodata' ) {
-              // Swal.fire('No existen retiros pendientes');
             } else {
-              this.retiros = dev.datos;
-            }
-            if ( event !== undefined ) {
-              event.target.complete();
+              this.filasRetiro = dev.datos.length;
+              const rows = [];
+              dev.datos.forEach(element => rows.push(element, { detailRow: false, element }));
+              this.dsRetiros = new MatTableDataSource(rows);
+              this.dsRetiros.paginator = this.paginator.toArray()[0];
             }
         },
         (error) => {
           Swal.fire(error);
         });
   }
-  doRefreshPendientes( event ) {
-    this.cargarDatosPendientes( event );
+  aplicarFiltroRetiro( event ) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dsRetiros.filter = filterValue.trim().toLowerCase();
   }
+  // function
+  isExpansionDetailRowR = (i, row) => row.hasOwnProperty('detailRow');
 
-  cargarDatosAcopio( event? ) {
-    this.cargando = true;
-    this.acopios = [];
-    this.stockSS.servicioWEB( '/acopiar', { ficha: this.login.usuario.id, todos: '*' } )
-        .subscribe( (dev: any) => {
-            // console.log(dev);
-            this.cargando = false;
-            if ( dev.resultado === 'error' ) {
-              Swal.fire('No existen acopios pendientes');
-            } else if ( dev.resultado === 'nodata' ) {
-              // Swal.fire('No existen acopios pendientes');
-            } else {
-              this.acopios = dev.datos;
-            }
-            if ( event !== undefined ) {
-              event.target.complete();
-            }
-        },
-        (error) => {
-          if ( error ) {
-            console.log(error);
-            Swal.fire(error);
-          }
-        });
-  }
-  doRefreshAcopio( event ) {
-    this.cargarDatosAcopio( event );
-  }
-
-  nextCliente() {
-    this.offset += 15;
-    this.cargarDatosClientes();
-  }
-  previoCliente() {
-    this.offset -= 15;
-    if ( this.offset < 0 ) {
-       this.offset = 0;
-    }
-    this.cargarDatosClientes();
-  }
-
-  cargarDatosClientes( event? ) {
+  cargarDatosClientes() {
     this.buscando = true;
     this.stockSS.servicioWEB( '/clientes', { buscar: this.nombreorut, offset: this.offset } )
         .subscribe( (dev: any) => {
-            // console.log(dev);
+            console.log('cargarDatosClientes', dev);
             this.buscando = false;
-            if ( dev.resultado === 'error' ) {
-              Swal.fire( (this.nombreorut !== '' ) ? 'La búsqueda no obtuvo resultados' : 'No existen clientes definidos');
-            } else if ( dev.resultado === 'nodata' ) {
-              Swal.fire( (this.nombreorut !== '' ) ? 'La búsqueda no obtuvo resultados' : 'No existen clientes definidos');
+            if ( dev.resultado === 'error' || dev.resultado === 'nodata' ) {
+              Swal.fire( 'La búsqueda no obtuvo resultados' );
             } else {
-              this.clientes = dev.datos;
-            }
-            if ( event !== undefined ) {
-              event.target.complete();
+              this.filasClientes = dev.datos.length;
+              this.dsClientes = new MatTableDataSource(dev.datos);
+              this.dsClientes.paginator = this.paginator.toArray()[1];
             }
         },
         (error) => {
           Swal.fire('ERROR', error);
         });
   }
-  doRefreshClientes( event ) {
-    this.cargarDatosClientes( event );
+  aplicarFiltroClientes( event ) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dsClientes.filter = filterValue.trim().toLowerCase();
   }
+  // function
+  isExpansionDetailRowC = (i, row) => row.hasOwnProperty('detailRow');
 
   revisarEncomienda( item ) {
     this.encomienda = item;
-    // console.log(this.encomienda);
   }
   updateEncomienda() {
     // validar lo datos
-    // console.log(this.encomienda);
     // si ya estamos procesando....
     this.encomienda['fecha_prometida'] = this.encomienda['llegada'];
     if ( this.encomienda['fecha_prometida'] === undefined || this.encomienda['fecha_prometida'] === null ) {
@@ -289,10 +286,12 @@ export class EncomiendasComponent implements OnInit {
     this.idfoto = undefined;
     this.cargando = true;
     const IMG_URL = this.stockSS.url + '/public/img/' ;
+    console.log(IMG_URL);
+    console.log(item.id_paquete);
     this.stockSS.servicioWEB( '/getimages', { id_pqt: item.id_paquete } )
         .subscribe( (dev: any) => {
           this.cargando = false;
-          // console.log(dev);
+          console.log(dev);
           if ( dev.resultado === 'ok' ) {
             this.idfoto = item.id_paquete;
             this.foto   = IMG_URL + dev.datos[0].imgb64;
@@ -317,27 +316,39 @@ export class EncomiendasComponent implements OnInit {
     this.linea.lat = '';
     this.linea.lng = '';
   }
-
   editarCliente( item ) {
     this.linea = item;
   }
-
   grabarCliente() {
-    this.buscando = true;
-    this.stockSS.servicioWEB( '/upClientes', this.linea )
-        .subscribe( (dev: any) => {
-            console.log(dev);
-            this.buscando = false;
-            if ( dev.resultado === 'ok' ) {
-              this.limpiar();
-              Swal.fire('Cliente fue grabado con éxito' );
-            } else  {
-              Swal.fire( dev.datos );
-            }
-        },
-        (error) => {
-          Swal.fire('ERROR', error);
-        });
+    if ( this.linea.comuna === '' || this.linea.comuna === undefined || this.linea.comuna === null ) {
+      Swal.fire('ERROR', 'Debe definir Comuna');
+    } else if ( this.linea.rut === '' || this.linea.rut === undefined || this.linea.rut === null ) {
+      Swal.fire('ERROR', 'Debe definir el rut (o digitar sin-rut)');
+    } else if ( this.linea.direccion === '' || this.linea.direccion === undefined || this.linea.direccion === null ) {
+      Swal.fire('ERROR', 'Debe definir una dirección');
+    } else if ( this.linea.razon_social === '' || this.linea.razon_social === undefined || this.linea.razon_social === null ) {
+      Swal.fire('ERROR', 'Debe definir Nombre o Razón social');
+    } else if ( this.linea.telefono1 === '' || this.linea.telefono1 === undefined || this.linea.telefono1 === null ) {
+      Swal.fire('ERROR', 'Debe definir un teléfono');
+    } else {
+      //
+      this.buscando = true;
+      this.stockSS.servicioWEB( '/upClientes', this.linea )
+          .subscribe( (dev: any) => {
+              console.log(dev);
+              this.buscando = false;
+              if ( dev.resultado === 'ok' ) {
+                this.limpiar();
+                Swal.fire('Cliente fue grabado con éxito' );
+              } else  {
+                Swal.fire( dev.datos );
+              }
+          },
+          (error) => {
+            Swal.fire('ERROR', error);
+          });
+      //
+    }
   }
 
   limpiar() {
@@ -354,12 +365,10 @@ export class EncomiendasComponent implements OnInit {
       Swal.fire( 'No existen datos para buscar.' );
     }
   }
-
   limpiaDataChica() {
     this.buscarCliente = '';
     this.clienteChico = [];
   }
-
   buscarClientesChico() {
     if ( this.buscarCliente !== '' ) {
       this.buscandoChico = true;
@@ -519,13 +528,13 @@ export class EncomiendasComponent implements OnInit {
   async buscarPaquete( cambio? ) {
     if ( this.idpqt !== 0 ) {
       this.buscandoID = true;
-      this.estadosPqt = [];
       await this.stockSS.servicioWEB( '/estado_pqt', { idpqt: this.idpqt } )
         .subscribe( (dev: any) => {
-            console.log(dev);
+            // console.log(dev);
             this.buscandoID = false;
             if ( dev.resultado === 'ok' ) {
-              this.estadosPqt = dev.datos;
+              this.dsSeguimiento = new MatTableDataSource(dev.datos);
+              this.dsSeguimiento.paginator = this.paginator.toArray()[2];
             } else {
               if ( !cambio ) {
                 Swal.fire( 'La búsqueda no obtuvo resultados');
@@ -667,5 +676,35 @@ export class EncomiendasComponent implements OnInit {
           }
       });
   }
+
+  buscarPaquetes() {
+    this.buscando = true;
+    this.stockSS.servicioWEB( '/dameEncomiendas', { ficha: this.login.usuario.id,
+                                                    idCliente: 0, idDestina: 0,
+                                                    fechaIni: this.guias.fechaNormal( this.fechaIni ) ,
+                                                    fechaFin: this.guias.fechaNormal( this.fechaFin ) } )
+        .subscribe( (dev: any) => {
+            // console.log(dev);
+            this.buscando = false;
+            if ( dev.resultado === 'error' || dev.resultado === 'nodata' ) {
+              Swal.fire('No existen encomiendas para los parámetros entregados.');
+            } else {
+              const rows = [];
+              dev.datos.forEach(element => rows.push(element, { detailRow: true, element }));
+              this.filasBusqueda = rows.length;
+              this.dsBusquedas = new MatTableDataSource(rows);
+              this.dsBusquedas.paginator = this.paginator.toArray()[2];
+            }
+        },
+        (error) => {
+          Swal.fire(error);
+        });
+  }
+  aplicarFiltroBusquedasB( event ) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dsBusquedas.filter = filterValue.trim().toLowerCase();
+  }
+  // function
+  isExpansionDetailRowB = (i, row) => row.hasOwnProperty('detailRow');
 
 }
