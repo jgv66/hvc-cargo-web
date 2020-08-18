@@ -137,37 +137,37 @@
             </form>
         </div>
     </div>
-    <!-- Retiros -->
+    <!-- pendientes de transportar -->
     <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
         <!-- sector de retiro -->
         <div class="progress" *ngIf=" buscandoRetiros ">
             <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;height: 5px;"></div>
         </div>
-        <div class="mat-elevation-z8">
-            <div class="form-row mt-2 mb-2">
-                <div class="col-4" *ngIf=" filasRetiro > 0 " style="margin-top:10px">
-                    <mat-form-field appearance="" style="margin-left: 15px;width:350px">
-                        <mat-label>Filtrar</mat-label>
-                        <input matInput (keyup)="aplicarFiltroRetiro( $event )" name="filtroRetiro" [(ngModel)]="filtro" placeholder="digite algo..." #input>
-                        <button mat-button *ngIf=" filtro !== '' " matSuffix mat-icon-button aria-label="Clear" (click)=" filtro = '' ">
-                            <mat-icon>close</mat-icon>
-                        </button>
-                    </mat-form-field>
-                </div>
-                <div class="col-2" style="max-height: 50px; height: 50px;">
-                    <button type="button" class="btn btn-link text-right" (click)="cargarDatosPendientes()">
-                        <i class="mdi mdi-refresh mdi-36px"></i>
+        <div class="form-row mt-2 mb-2">
+            <div class="col-3" *ngIf=" filasRetiro > 0 " style="margin-top:10px">
+                <mat-form-field appearance="" style="margin-left: 15px;width:350px">
+                    <mat-label>Filtrar</mat-label>
+                    <input matInput (keyup)="aplicarFiltroRetiro( $event )" name="filtroRetiro" [(ngModel)]="filtro" placeholder="digite algo..." #input>
+                    <button mat-button *ngIf=" filtro !== '' " matSuffix mat-icon-button aria-label="Clear" (click)=" filtro = '' ">
+                        <mat-icon>close</mat-icon>
                     </button>
-                </div>
+                </mat-form-field>
             </div>
-            <table mat-table class="mat-table al100" [dataSource]="dsRetiros" style="margin-top: -20px;">
+            <div class="col-1" style="max-height: 50px; height: 50px;margin-left:10px;margin-top:20px;">
+                <button type="button" class="btn btn-block btn-primary" (click)="cargarDatosPendientes()">
+                    <i class="mdi mdi-refresh mdi-12px"></i>Refrescar
+                </button>
+            </div>
+        </div>
+        <div class="mat-elevation-z8">
+            <table mat-table class="mat-table" matSort [dataSource]="dsRetiros" style="margin-top: -10px;">
 
                 <ng-container matColumnDef="id_paquete">
-                    <mat-header-cell *matHeaderCellDef style="max-width: 100px;width: 100px;"> #Id </mat-header-cell>
+                    <mat-header-cell *matHeaderCellDef style="max-width: 100px;width: 100px;" mat-sort-header> #Id </mat-header-cell>
                     <mat-cell *matCellDef="let element" style="max-width: 100px;width: 100px;"><b> #{{element.id_paquete}} </b></mat-cell>
                 </ng-container>
                 <ng-container matColumnDef="fecha_creacion">
-                    <mat-header-cell *matHeaderCellDef style="max-width: 150px;width: 150px;">Fecha Creación</mat-header-cell>
+                    <mat-header-cell *matHeaderCellDef style="max-width: 150px;width: 150px;" mat-sort-header>Fecha Creación</mat-header-cell>
                     <mat-cell *matCellDef="let element" style="max-width: 150px;width: 150px;"> {{element.fecha_creacion}} </mat-cell>
                 </ng-container>
                 <ng-container matColumnDef="obs_carga">
@@ -175,11 +175,11 @@
                     <mat-cell *matCellDef="let element" style="max-width: 150px;width: 150px;"> {{element.obs_carga}} </mat-cell>
                 </ng-container>
                 <ng-container matColumnDef="cli_razon">
-                    <mat-header-cell *matHeaderCellDef style="max-width: 430px;width: 430px;"> Cliente </mat-header-cell>
+                    <mat-header-cell *matHeaderCellDef style="max-width: 430px;width: 430px;" mat-sort-header> Cliente </mat-header-cell>
                     <mat-cell *matCellDef="let element" style="max-width: 430px;width: 430px;"> {{element.cli_razon}} </mat-cell>
                 </ng-container>
                 <ng-container matColumnDef="des_razon">
-                    <mat-header-cell *matHeaderCellDef style="max-width: 400px;width: 400px;"> Destinatario </mat-header-cell>
+                    <mat-header-cell *matHeaderCellDef style="max-width: 400px;width: 400px;" mat-sort-header> Destinatario </mat-header-cell>
                     <mat-cell *matCellDef="let element" style="max-width: 400px;width: 400px;"> {{element.des_razon}} </mat-cell>
                 </ng-container>
                 <ng-container matColumnDef="tipo_pago">
@@ -187,7 +187,7 @@
                     <mat-cell *matCellDef="let element" style="max-width: 180px;width: 180px;font-weight: bold; color: red"> {{element.tipo_pago}} </mat-cell>
                 </ng-container>
                 <ng-container matColumnDef="estado">
-                    <mat-header-cell *matHeaderCellDef style="max-width: 200px;width: 200px;"> Estado </mat-header-cell>
+                    <mat-header-cell *matHeaderCellDef style="max-width: 200px;width: 200px;" mat-sort-header> Estado </mat-header-cell>
                     <mat-cell *matCellDef="let element" style="max-width: 200px;width: 200px;"> {{element.estado}} </mat-cell>
                 </ng-container>
                 <ng-container matColumnDef="acciones">
@@ -248,8 +248,8 @@
                 <mat-row *matRowDef="let row; columns: ['detalleRetiros']; when: isExpansionDetailRowR" [@detailExpand]="row.element == expandedElementR ? 'expanded' : 'collapsed'" style="overflow: hidden"></mat-row>
             </table>
 
+            <mat-paginator [hidePageSize]="true" [length]="filasRetiro" [pageSize]="(filasRetiro>7)?16:filasRetiro*2" [pageSizeOptions]="[16, 32, 64]" showFirstLastButtons></mat-paginator>
         </div>
-        <mat-paginator [hidePageSize]="true" [length]="filasRetiro" [pageSize]="(filasRetiro>7)?16:filasRetiro*2" [pageSizeOptions]="[16, 32, 64]" showFirstLastButtons></mat-paginator>
     </div>
     <!-- clientes -->
     <div class="tab-pane fade" id="nav-cliente" role="tabpanel" aria-labelledby="nav-cliente-tab">
@@ -257,7 +257,7 @@
             <!-- buscar clientes -->
             <form (ngSubmit)="buscarClientes()">
                 <div class="form-row mt-2 mb-2">
-                    <div class="col-4" style="padding-left: 20px;">
+                    <div class="col-3" style="padding-left: 20px;">
                         <mat-form-field appearance="" style="max-height:50px;height:50px;width:350px">
                             <mat-label>Buscar Clientes</mat-label>
                             <input matInput placeholder="digite algo del nombre o rut..." name="nombreorut" [(ngModel)]="nombreorut">
@@ -267,11 +267,16 @@
                         </mat-form-field>
                     </div>
                     <div class="col-1" style="max-height: 50px; height: 50px;">
-                        <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Buscar</button>
+                        <button type="submit" class="btn btn-primary btn-block" style="margin-top: 10px;">Buscar</button>
                     </div>
-                    <button class="col-1" type="button" class="btn btn-link text-right" style="padding-top: 0px;margin-top: 10px;" (click)="crearCliente()" data-toggle="modal" data-target="#ModalCenteredCrear">
+                    <div class="col-1" style="max-height: 50px; height: 50px;margin-left:10px;" (click)="crearCliente()" data-toggle="modal" data-target="#ModalCenteredCrear">
+                        <button type="button" class="btn btn-primary" style="margin-top: 10px;"><i class="mdi mdi-plus-circle-outline mdi-12px"></i>
+                            Crear
+                        </button>
+                    </div>
+                    <!-- <button class="col-1" type="button" class="btn btn-link text-right" style="padding-top: 0px;margin-top: 10px;" (click)="crearCliente()" data-toggle="modal" data-target="#ModalCenteredCrear">
                         <i class="mdi mdi-plus-circle-outline mdi-36px"></i>
-                    </button>
+                    </button> -->
                 </div>
             </form>
 
@@ -471,7 +476,7 @@
                             </button>
                         </mat-form-field>
                     </div>
-                    <div class="col-2" style="max-height: 50px; height: 50px;">
+                    <div class="col-1" style="max-height: 50px; height: 50px;margin-left:70px;">
                         <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Buscar</button>
                     </div>
                 </div>
@@ -507,9 +512,7 @@
             </div>
         </div>
     </div>
-
 </div>
-
 <!-- Modal que despliega la foto -->
 <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -529,7 +532,6 @@
         </div>
     </div>
 </div>
-
 <!-- Modal buscar clientes -->
 <div class="modal fade" id="buscarClientes" tabindex="-1" role="dialog" aria-labelledby="#buscarClientes" aria-hidden="true">
     <div class="modal-dialog modal-xl" style="max-width: 950px;">
@@ -588,7 +590,6 @@
         </div>
     </div>
 </div>
-
 <!-- Modal buscar destinatarios -->
 <div class="modal fade" id="buscarDestinos" tabindex="-1" role="dialog" aria-labelledby="#buscarDestinos" aria-hidden="true">
     <div class="modal-dialog modal-xl" style="max-width: 950px;">
@@ -647,9 +648,8 @@
         </div>
     </div>
 </div>
-
 <!-- Modal crear/modificar cliente -->
-<div class="modal fade" id="ModalCenteredCrear" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false" aria-labelledby="ModalCenteredCrearLabel" aria-hidden="true">
+<div class="modal fade" id="ModalCenteredCrear" tabindex="-1" role="dialog" aria-labelledby="ModalCenteredCrearLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content" style="width: 670px;">
             <div class="modal-header">
@@ -659,57 +659,64 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div class="row" style="margin-top: 10px;">
-                    <div class="col-12" style="margin-top: 10px;">
-                        <label class="col-3 col-form-label">Rut (*)</label>
-                        <input class="form-control col-9" type="text" name="xrut" [(ngModel)]="linea.rut">
+                <form #regCliForm="ngForm">
+                    <div class="row">
+                        <div class="col-12" style="margin-top: 10px;">
+                            <input class="form-control col-12" type="text" placeholder="RUT" #rut="ngModel" name="rut" [(ngModel)]="linea.rut" required minlength="7" value="sin-rut">
+                            <div [hidden]=" rut.valid || rut.pristine " class="alert alert-danger">
+                                Valor mínimo es de 7 dígitos o puede digitar <b>sin-rut</b>
+                            </div>
+                        </div>
+                        <div class="col-12" style="margin-top: 10px;">
+                            <input class="form-control col-12" type="text" placeholder="Nombre o Razón social" #razon="ngModel" name="razon" [(ngModel)]="linea.razon_social" required minlength="2">
+                            <div [hidden]=" razon.valid || razon.pristine " class="alert alert-danger">
+                                Este campo debe contener la Razón Social
+                            </div>
+                        </div>
+                        <div class="col-12" style="margin-top: 10px;">
+                            <input class="form-control col-12" type="text" placeholder="Nombre de fantasía" name="fantasia" [(ngModel)]="linea.nombre_fantasia">
+                        </div>
+                        <div class="col-12" style="margin-top: 10px;">
+                            <input class="form-control col-12" type="text" placeholder="Dirección del cliente" #direccion="ngModel" name="direccion" [(ngModel)]="linea.direccion" required minlength="2">
+                            <div [hidden]=" direccion.valid || direccion.pristine " class="alert alert-danger">
+                                Sin esta información no podremos ubicarlo... OBVIO !!!
+                            </div>
+                        </div>
+                        <div class="col-12" style="margin-top: 10px;">
+                            <select class="form-control col-12 text-left" #comuna="ngModel" name="comuna" [(ngModel)]="linea.comuna" required>
+                                <option value="">Comuna (seleccione de la lista)</option>
+                                <option *ngFor="let comu of login.ciudadesPermitidas" [value]="comu.ciudad">{{ comu.ciudad }}</option>
+                            </select>
+                            <div [hidden]=" comuna.valid || comuna.pristine " class="alert alert-danger">
+                                Esta información es muy útil además de ser obligatoria...
+                            </div>
+                        </div>
+                        <div class="col-12" style="margin-top: 10px;">
+                            <input class="form-control col-12" type="text" placeholder="Número de teléfono o celular" #fono="ngModel" name="fono" [(ngModel)]="linea.telefono1" required minlength="7">
+                            <div [hidden]=" fono.valid || fono.pristine " class="alert alert-danger">
+                                Requerida para ubicar a nuestros clientes...
+                            </div>
+                        </div>
+                        <div class="col-12" style="margin-top: 10px;">
+                            <input class="form-control col-12" type="text" placeholder="Otro número telefónico (alternativo)" name="telefono2" [(ngModel)]="linea.telefono2">
+                        </div>
+                        <div class="col-12" style="margin-top: 10px;">
+                            <input class="form-control col-12" type="email" placeholder="Email o correo electrónico" name="email" [(ngModel)]="linea.email" email>
+                        </div>
+                        <div class="col-12" style="margin-top: 10px; margin-bottom: 23px;">
+                            <input class="form-control col-12" type="text" name="referencias" [(ngModel)]="linea.referencias" placeholder="Ubicación, proximidad o cruce referencial...">
+                        </div>
                     </div>
-                    <div class="col-12" style="margin-top: 10px;">
-                        <label class="col-3 col-form-label">Nombre (*)</label>
-                        <input class="form-control col-9" type="text" name="razon_social" [(ngModel)]="linea.razon_social">
-                    </div>
-                    <div class="col-12" style="margin-top: 10px;">
-                        <label class="col-3 col-form-label">Nombre fantasia</label>
-                        <input class="form-control col-9" type="text" name="razon_fantasia" [(ngModel)]="linea.nombre_fantasia">
-                    </div>
-                    <div class="col-12" style="margin-top: 10px;">
-                        <label class="col-3 col-form-label">Dirección (*)</label>
-                        <input class="form-control col-9" type="text" name="direccion" [(ngModel)]="linea.direccion">
-                    </div>
-                    <div class="col-12" style="margin-top: 10px;">
-                        <label class="col-3 col-form-label text-left">Comuna (*)</label>
-                        <select class="form-control col-9 text-left" name="comuna" [(ngModel)]="linea.comuna">
-                          <option value="">Seleccione una comuna</option>
-                          <option *ngFor="let comu of login.ciudadesPermitidas" [value]="comu.ciudad">{{ comu.ciudad }}</option>
-                        </select>
-                    </div>
-                    <div class="col-12" style="margin-top: 10px;">
-                        <label class="col-3 col-form-label">Teléfono-1 (*)</label>
-                        <input class="form-control col-9" type="text" name="telefono1" [(ngModel)]="linea.telefono1">
-                    </div>
-                    <div class="col-12" style="margin-top: 10px;">
-                        <label class="col-3 col-form-label">Teléfono-2</label>
-                        <input class="form-control col-9" type="text" name="telefono2" [(ngModel)]="linea.telefono2">
-                    </div>
-                    <div class="col-12" style="margin-top: 10px;">
-                        <label class="col-3 col-form-label">e-Mail</label>
-                        <input class="form-control col-9" type="mail" name="email" [(ngModel)]="linea.email">
-                    </div>
-                    <div class="col-12" style="margin-top: 10px;">
-                        <label class="col-3 col-form-label">Referencias</label>
-                        <input class="form-control col-9" type="text" name="referencias" [(ngModel)]="linea.referencias" placeholder="ubicacion o proximidad o cruce...">
-                    </div>
+                </form>
+                <div class="modal-footer">
+                    <div class="example-label" style="margin-right: 50px;">Campos con borde rojo son obligatorios</div>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" [disabled]=" !regCliForm.valid " data-dismiss="modal" (click)="grabarCliente( regCliForm )">Grabar y actualizar</button>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <div class="example-label">(*) Campos obligatorios</div>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary" (click)="grabarCliente()">Grabar y actualizar</button>
             </div>
         </div>
     </div>
 </div>
-
 <!-- Modal editar encomienda -->
 <div class="modal fade" id="EditEncomienda" tabindex="-1" role="dialog" aria-labelledby="EditEncomiendaLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -771,7 +778,6 @@
                 </div>
          -->
 </div>
-
 <!-- Modal estados de la encomienda -->
 <div class="modal fade" id="EditEstados" tabindex="-1" role="dialog" aria-labelledby="EditEstadosLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
@@ -832,7 +838,6 @@
         </div>
     </div>
 </div>
-
 <!-- Modal buscar usuarios -->
 <div class="modal fade" id="buscarUsuario" tabindex="-1" role="dialog" aria-labelledby="#buscarUsuario" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-striped" style="max-width: 950px;">
@@ -877,5 +882,4 @@
         </div>
     </div>
 </div>
-
 <!-- fin modal -->

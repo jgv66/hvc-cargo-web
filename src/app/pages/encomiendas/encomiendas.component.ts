@@ -1,15 +1,16 @@
-import { Component, OnInit, ViewChild, ViewChildren, AfterViewInit, QueryList } from '@angular/core';
+import { Component, OnInit, ViewChildren, QueryList } from '@angular/core';
 import { Router } from '@angular/router';
+import { NgForm } from '@angular/forms';
 import { StockService } from '../../services/stock.service';
 import { LoginService } from '../../services/login.service';
 import { GuiasService } from '../../services/guias.service';
-import { animate, state, style, transition, trigger } from '@angular/animations';
-
-// ES6 Modules or TypeScript
+// sweet alert
 import Swal from 'sweetalert2';
-
+// material
+import { MatTableDataSource } from '@angular/material';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatTableDataSource, MatSort } from '@angular/material';
+import { MatSort } from '@angular/material/sort';
+import { animate, state, style, transition, trigger } from '@angular/animations';
 
 @Component({
   selector: 'app-encomiendas',
@@ -42,7 +43,7 @@ export class EncomiendasComponent implements OnInit {
   dispColSeguimiento: string[] = ['id', 'fecha', 'hora', 'usuario', 'notas'];
 
   expandedElementR: any;
-  expandedElementC: any;
+  expandedElementB: any;
 
   filtro = '';
 
@@ -110,6 +111,7 @@ export class EncomiendasComponent implements OnInit {
               dev.datos.forEach(element => rows.push(element, { detailRow: false, element }));
               this.dsRetiros = new MatTableDataSource(rows);
               this.dsRetiros.paginator = this.paginator.toArray()[0];
+              this.dsRetiros.sort = this.sort.toArray()[0];
             }
         },
         (error) => {
@@ -119,6 +121,11 @@ export class EncomiendasComponent implements OnInit {
   aplicarFiltroRetiro( event ) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dsRetiros.filter = filterValue.trim().toLowerCase();
+    //
+    if (this.dsRetiros.paginator) {
+      this.dsRetiros.paginator.firstPage();
+    }
+    //
   }
   // function
   isExpansionDetailRowR = (i, row) => row.hasOwnProperty('detailRow');
@@ -144,9 +151,12 @@ export class EncomiendasComponent implements OnInit {
   aplicarFiltroClientes( event ) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dsClientes.filter = filterValue.trim().toLowerCase();
+    //
+    if (this.dsClientes.paginator) {
+      this.dsClientes.paginator.firstPage();
+    }
+    //
   }
-  // function
-  isExpansionDetailRowC = (i, row) => row.hasOwnProperty('detailRow');
 
   revisarEncomienda( item ) {
     this.encomienda = item;
@@ -319,40 +329,31 @@ export class EncomiendasComponent implements OnInit {
   editarCliente( item ) {
     this.linea = item;
   }
-  grabarCliente() {
-    if ( this.linea.comuna === '' || this.linea.comuna === undefined || this.linea.comuna === null ) {
-      Swal.fire('ERROR', 'Debe definir Comuna');
-    } else if ( this.linea.rut === '' || this.linea.rut === undefined || this.linea.rut === null ) {
-      Swal.fire('ERROR', 'Debe definir el rut (o digitar sin-rut)');
-    } else if ( this.linea.direccion === '' || this.linea.direccion === undefined || this.linea.direccion === null ) {
-      Swal.fire('ERROR', 'Debe definir una dirección');
-    } else if ( this.linea.razon_social === '' || this.linea.razon_social === undefined || this.linea.razon_social === null ) {
-      Swal.fire('ERROR', 'Debe definir Nombre o Razón social');
-    } else if ( this.linea.telefono1 === '' || this.linea.telefono1 === undefined || this.linea.telefono1 === null ) {
-      Swal.fire('ERROR', 'Debe definir un teléfono');
-    } else {
-      //
-      this.buscando = true;
-      this.stockSS.servicioWEB( '/upClientes', this.linea )
-          .subscribe( (dev: any) => {
-              console.log(dev);
-              this.buscando = false;
-              if ( dev.resultado === 'ok' ) {
-                this.limpiar();
-                Swal.fire('Cliente fue grabado con éxito' );
-              } else  {
-                Swal.fire( dev.datos );
-              }
-          },
-          (error) => {
-            Swal.fire('ERROR', error);
-          });
-      //
+  grabarCliente( regCliForm: NgForm ) {
+    if ( regCliForm.invalid ) {
+      Swal.fire('ERROR', 'Debe definir los datos obliogatorios para continuar con una grabación');
+      return;
     }
+    this.buscando = true;
+    this.stockSS.servicioWEB( '/upClientes', this.linea )
+      .subscribe( (dev: any) => {
+          console.log(dev);
+          this.buscando = false;
+          if ( dev.resultado === 'ok' ) {
+            this.limpiar();
+            Swal.fire('Cliente fue grabado con éxito' );
+            regCliForm.reset();
+          } else  {
+            Swal.fire( dev.datos );
+          }
+      },
+      (error) => {
+        Swal.fire('ERROR', error);
+      });
+    
   }
 
   limpiar() {
-    this.offset = 0;
     this.nombreorut = '';
     this.cargarDatosClientes();
   }

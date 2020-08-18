@@ -16,6 +16,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatIconModule} from '@angular/material/icon';
+import {MatSortModule} from '@angular/material';
 
 @NgModule({
     providers: [
@@ -33,7 +34,8 @@ import {MatIconModule} from '@angular/material/icon';
       MatDatepickerModule,
       MatProgressSpinnerModule,
       MatIconModule,
-      MatListModule
+      MatListModule,
+      MatSortModule
       ],
     exports: [
       MatButtonModule,
@@ -47,7 +49,8 @@ import {MatIconModule} from '@angular/material/icon';
       MatDatepickerModule,
       MatProgressSpinnerModule,
       MatIconModule,
-      MatListModule
+      MatListModule,
+      MatSortModule
     ],
   })
 
