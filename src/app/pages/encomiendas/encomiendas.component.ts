@@ -90,8 +90,6 @@ export class EncomiendasComponent implements OnInit {
       this.router.navigate(['/login']);
     }
     this.cargarDatosPendientes();
-    // this.cargarDatosPorAcopiar();
-    // this.cargarDatosAcopio();
     this.initCarga();
   }
 
@@ -340,7 +338,6 @@ export class EncomiendasComponent implements OnInit {
           console.log(dev);
           this.buscando = false;
           if ( dev.resultado === 'ok' ) {
-            this.limpiar();
             Swal.fire('Cliente fue grabado con éxito' );
             regCliForm.reset();
           } else  {
@@ -350,12 +347,7 @@ export class EncomiendasComponent implements OnInit {
       (error) => {
         Swal.fire('ERROR', error);
       });
-    
-  }
 
-  limpiar() {
-    this.nombreorut = '';
-    this.cargarDatosClientes();
   }
 
   buscarClientes() {
@@ -692,7 +684,7 @@ export class EncomiendasComponent implements OnInit {
             } else {
               const rows = [];
               dev.datos.forEach(element => rows.push(element, { detailRow: true, element }));
-              this.filasBusqueda = rows.length;
+              this.filasBusqueda = dev.datos.length;
               this.dsBusquedas = new MatTableDataSource(rows);
               this.dsBusquedas.paginator = this.paginator.toArray()[2];
             }

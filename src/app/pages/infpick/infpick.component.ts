@@ -4,8 +4,10 @@ import { LoginService } from '../../services/login.service';
 import { StockService } from '../../services/stock.service';
 import { GuiasService } from '../../services/guias.service';
 
-import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { animate, state, style, transition, trigger } from '@angular/animations';
 
 // ES6 Modules or TypeScript
 import Swal from 'sweetalert2';
@@ -14,15 +16,24 @@ import Swal from 'sweetalert2';
   selector: 'app-infpick',
   templateUrl: './infpick.component.html',
   styleUrls: ['./infpick.component.scss'],
+  animations: [
+    trigger('detailExpand', [
+      state('collapsed', style({ height: '0px', minHeight: '0', visibility: 'hidden' })),
+      state('expanded', style({ height: '*', visibility: 'visible' })),
+      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+    ]),
+  ]
 })
 export class InfpickComponent implements OnInit {
 
   @ViewChild( MatPaginator, {static: true}) paginator: MatPaginator;
+  @ViewChild( MatSort, {static: true}) sort: MatSort;
 
   dataSource: MatTableDataSource<any>;
 
   displayedColumns: string[] = ['id_paquete', 'fecha_creacion', 'obs_carga', 'cli_razon', 'des_razon', 'tipo_pago', 'estado'];
   pageSize = 10;
+  filasPick = 0;
 
   fechaIni = new Date();
   fechaFin = new Date();
@@ -59,15 +70,12 @@ export class InfpickComponent implements OnInit {
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
-  onRowClicked(row) {
-    // console.log(row);
-  }
-
   consultar( event? ) {
     // tslint:disable-next-line: no-console
     // console.time( '1' );
     this.cargando = true;
     this.retiros  = [];
+    this.filasPick = 0;
     this.stockSS.servicioWEB( '/dameEncomiendas', { ficha: this.login.usuario.id,
                                                     idCliente: 0, idDestina: 0,
                                                     fechaIni: this.guias.fechaNormal( this.fechaIni ) ,
@@ -79,8 +87,10 @@ export class InfpickComponent implements OnInit {
               Swal.fire('No existen encomiendas para los parámetros entregados.');
             } else {
               this.retiros = dev.datos;
+              this.filasPick = dev.datos.length;
               this.dataSource = new MatTableDataSource(dev.datos);
               this.dataSource.paginator = this.paginator;
+              this.dataSource.sort = this.sort;
             }
             if ( event !== undefined ) {
               event.target.complete();
@@ -96,6 +106,5 @@ export class InfpickComponent implements OnInit {
   onPaginateChange(event) {
     console.log(event);
   }
-
 
 }

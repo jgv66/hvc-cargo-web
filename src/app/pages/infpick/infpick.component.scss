@@ -1,10 +1,59 @@
+.hide-paginator {
+    display: none !important;
+}
+
+.fuente75 {
+    font-size: 90%;
+    font-weight: normal;
+}
+
+p {
+    margin-bottom: 5px;
+}
+
 table {
     width: 100%;
 }
 
-// .mat-column-select {
-//     overflow: initial;
-// }
-.hide-paginator {
-    display: none !important;
+.sinBorde {
+    border: 0;
+    border-bottom: 0px solid #000;
+    height: 24px;
+    padding-top: 18px;
+}
+
+.modal-body-scroll {
+    height: 500px;
+    width: 100%;
+    overflow-y: auto;
+}
+
+select option {
+    display: block;
+    text-overflow: ellipsis;
+    max-height: 200px;
+}
+
+mat-header-cell {
+    font-weight: bold;
+    background-color: #03a9f438;
+}
+
+mat-cell {
+    font-weight: black;
+}
+
+th.mat-sort-header-sorted {
+    color: black;
+}
+
+.ng-valid[required],
+.ng-valid.required {
+    border-left: 5px solid #42A948;
+    /* green */
+}
+
+.ng-invalid:not(form) {
+    border-left: 5px solid #a94442;
+    /* red */
 }
