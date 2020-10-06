@@ -11,6 +11,7 @@ import { MatTableDataSource } from '@angular/material';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { animate, state, style, transition, trigger } from '@angular/animations';
+import { SelectionModel } from '@angular/cdk/collections';
 
 @Component({
   selector: 'app-encomiendas',
@@ -33,14 +34,18 @@ export class EncomiendasComponent implements OnInit {
   dsClientes: MatTableDataSource<any>;
   dsBusquedas: MatTableDataSource<any>;
   dsSeguimiento: MatTableDataSource<any>;
+  dsMasivos: MatTableDataSource<any>;
+  selection = new SelectionModel(true, []);
 
   filasRetiro = 0;
   filasClientes = 0;
   filasBusqueda = 0;
+  filasMasivos = 0;
 
   dispColumns: string[] = ['id_paquete', 'fecha_creacion', 'obs_carga', 'cli_razon', 'des_razon', 'tipo_pago', 'estado', 'acciones'];
   dispColClientes: string[] = ['rut', 'razon_social', 'direccion', 'telefono1', 'email', 'acciones'];
-  dispColSeguimiento: string[] = ['id', 'fecha', 'hora', 'usuario', 'notas'];
+  dispColSeguimiento: string[] = ['id', 'id_paquete', 'fecha', 'hora', 'usuario', 'notas'];
+  dispMasivos: string[] = ['select', 'id_paquete', 'fecha_creacion', 'obs_carga', 'cli_razon', 'des_razon', 'tipo_pago', 'estado'];
 
   expandedElementR: any;
   expandedElementB: any;
@@ -56,7 +61,7 @@ export class EncomiendasComponent implements OnInit {
   enProceso = false;
   grabandoEnco = false;
   retiros = [];
-  encomienda = {};
+  encomienda: any = {};
   poracopiar = [];
   acopios = [];
   clientes = [];
@@ -79,6 +84,8 @@ export class EncomiendasComponent implements OnInit {
 
   fechaIni = new Date();
   fechaFin = new Date();
+  idIni = 0;
+  idFin = 0;
 
   constructor( private router: Router,
                public login: LoginService,
@@ -110,6 +117,7 @@ export class EncomiendasComponent implements OnInit {
               this.dsRetiros = new MatTableDataSource(rows);
               this.dsRetiros.paginator = this.paginator.toArray()[0];
               this.dsRetiros.sort = this.sort.toArray()[0];
+              console.log(this.dsRetiros);
             }
         },
         (error) => {
@@ -132,7 +140,7 @@ export class EncomiendasComponent implements OnInit {
     this.buscando = true;
     this.stockSS.servicioWEB( '/clientes', { buscar: this.nombreorut, offset: this.offset } )
         .subscribe( (dev: any) => {
-            console.log('cargarDatosClientes', dev);
+            // console.log('cargarDatosClientes', dev);
             this.buscando = false;
             if ( dev.resultado === 'error' || dev.resultado === 'nodata' ) {
               Swal.fire( 'La búsqueda no obtuvo resultados' );
@@ -159,23 +167,24 @@ export class EncomiendasComponent implements OnInit {
   revisarEncomienda( item ) {
     this.encomienda = item;
   }
+
   updateEncomienda() {
     // validar lo datos
     // si ya estamos procesando....
-    this.encomienda['fecha_prometida'] = this.encomienda['llegada'];
-    if ( this.encomienda['fecha_prometida'] === undefined || this.encomienda['fecha_prometida'] === null ) {
+    this.encomienda.fecha_prometida = this.encomienda.llegada;
+    if ( this.encomienda.fecha_prometida === undefined || this.encomienda.fecha_prometida === null ) {
       Swal.fire('CUIDADO', 'Fecha prometida de llegada no esta definida.');
-    } else if ( this.encomienda['valor_cobrado'] < 0 || ( this.encomienda['valor_cobrado'] === 0 && this.encomienda['tipo_pago'] !== 'GRATIS' ) ) {
+    } else if ( this.encomienda.valor_cobrado < 0 || ( this.encomienda.valor_cobrado === 0 && this.encomienda.tipo_pago !== 'GRATIS' ) ) {
       Swal.fire('CUIDADO', 'Debe indicar valor cobrado por la encomienda.');
-    } else if ( this.encomienda['tipo_pago'] === '' ) {
+    } else if ( this.encomienda.tipo_pago === '' ) {
       Swal.fire('CUIDADO', 'Debe indicar el tipo de pago de la encomienda.');
-    } else if ( this.encomienda['obs_carga'] === '' ) {
+    } else if ( this.encomienda.obs_carga === '' ) {
       Swal.fire('CUIDADO', 'Debe indicar el tipo de encomienda que será transportada.');
-    } else if ( this.encomienda['bultos'] < 0 || this.encomienda['bultos'] === 0 ) {
+    } else if ( this.encomienda.bultos < 0 || this.encomienda.bultos === 0 ) {
       Swal.fire('CUIDADO', 'Debe indicar la cantidad de bultos de la encomienda.');
-    } else if ( this.encomienda['peso'] < 0 || this.encomienda['peso'] === 0 ) {
+    } else if ( this.encomienda.peso < 0 || this.encomienda.peso === 0 ) {
       Swal.fire('CUIDADO', 'Debe indicar el peso de la encomienda.');
-    } else if ( this.encomienda['volumen'] < 0 || this.encomienda['volumen'] === 0 ) {
+    } else if ( this.encomienda.volumen < 0 || this.encomienda.volumen === 0 ) {
       Swal.fire('CUIDADO', 'Debe indicar el volumen de la encomienda.');
     } else {
       Swal.fire({
@@ -219,7 +228,7 @@ export class EncomiendasComponent implements OnInit {
           this.enProceso = false;
           this.buscandoRetiros = false;
           //
-          console.log(data);
+          // console.log(data);
           if ( data.resultado === 'ok' ) {
             //
             Swal.fire({
@@ -294,16 +303,16 @@ export class EncomiendasComponent implements OnInit {
     this.idfoto = undefined;
     this.cargando = true;
     const IMG_URL = this.stockSS.url + '/public/img/' ;
-    console.log(IMG_URL);
-    console.log(item.id_paquete);
+    // console.log(IMG_URL);
+    // console.log(item.id_paquete);
     this.stockSS.servicioWEB( '/getimages', { id_pqt: item.id_paquete } )
         .subscribe( (dev: any) => {
           this.cargando = false;
-          console.log(dev);
+          // console.log(dev);
           if ( dev.resultado === 'ok' ) {
             this.idfoto = item.id_paquete;
             this.foto   = IMG_URL + dev.datos[0].imgb64;
-            console.log(this.foto);
+            // console.log(this.foto);
           }
         });
   }
@@ -335,7 +344,7 @@ export class EncomiendasComponent implements OnInit {
     this.buscando = true;
     this.stockSS.servicioWEB( '/upClientes', this.linea )
       .subscribe( (dev: any) => {
-          console.log(dev);
+          // console.log(dev);
           this.buscando = false;
           if ( dev.resultado === 'ok' ) {
             Swal.fire('Cliente fue grabado con éxito' );
@@ -433,7 +442,7 @@ export class EncomiendasComponent implements OnInit {
   }
   crearEncomienda() {
     // validar lo datos
-    console.log(this.carga);
+    // console.log(this.carga);
     // si ya estamos procesando....
     if ( this.carga.cliente === 0 ) {
       Swal.fire('CUIDADO', 'No se puede grabar sin haber definido al cliente.');
@@ -495,7 +504,7 @@ export class EncomiendasComponent implements OnInit {
           this.enProceso = false;
           this.grabandoEnco = false;
           //
-          console.log(data);
+          // console.log(data);
           if ( data.resultado === 'ok' ) {
             //
             Swal.fire({
@@ -649,7 +658,7 @@ export class EncomiendasComponent implements OnInit {
           //
           this.buscandoRetiros = false;
           //
-          console.log(data);
+          // console.log(data);
           if ( data.resultado === 'ok' ) {
             //
             Swal.fire({
@@ -670,23 +679,34 @@ export class EncomiendasComponent implements OnInit {
       });
   }
 
-  buscarPaquetes() {
+  buscarPaquetes( caso: string ) {
     this.buscando = true;
-    this.stockSS.servicioWEB( '/dameEncomiendas', { ficha: this.login.usuario.id,
-                                                    idCliente: 0, idDestina: 0,
-                                                    fechaIni: this.guias.fechaNormal( this.fechaIni ) ,
-                                                    fechaFin: this.guias.fechaNormal( this.fechaFin ) } )
+    this.stockSS.servicioWEB( (caso === 'buscar' ) ? '/dameEncomiendas' : '/dameMasivo',
+                             {  ficha: this.login.usuario.id,
+                                idCliente: 0, idDestina: 0,
+                                idIni: this.idIni,
+                                idFin: this.idFin,
+                                fechaIni: this.guias.fechaNormal( this.fechaIni ) ,
+                                fechaFin: this.guias.fechaNormal( this.fechaFin ) } )
         .subscribe( (dev: any) => {
-            // console.log(dev);
+            console.log(dev);
             this.buscando = false;
             if ( dev.resultado === 'error' || dev.resultado === 'nodata' ) {
               Swal.fire('No existen encomiendas para los parámetros entregados.');
             } else {
               const rows = [];
-              dev.datos.forEach(element => rows.push(element, { detailRow: true, element }));
-              this.filasBusqueda = dev.datos.length;
-              this.dsBusquedas = new MatTableDataSource(rows);
-              this.dsBusquedas.paginator = this.paginator.toArray()[2];
+              if ( caso === 'buscar') {
+                dev.datos.forEach(element => rows.push(element, { detailRow: true, element }));
+                this.filasBusqueda = dev.datos.length;
+                this.dsBusquedas = new MatTableDataSource(rows);
+                this.dsBusquedas.paginator = this.paginator.toArray()[2];
+              } else {
+                dev.datos.forEach(element => rows.push(element));
+                this.dsMasivos = new MatTableDataSource(rows);
+                this.selection = new SelectionModel<Element>(true, []);
+                this.filasMasivos = dev.datos.length;
+                // this.dsMasivos.paginator = this.paginator.toArray()[2];
+              }
             }
         },
         (error) => {
@@ -700,4 +720,107 @@ export class EncomiendasComponent implements OnInit {
   // function
   isExpansionDetailRowB = (i, row) => row.hasOwnProperty('detailRow');
 
+  /** Whether the number of selected elements matches the total number of rows. */
+  isAllSelected() {
+    if ( this.dsMasivos !== undefined ) {
+      const numSelected = this.selection.selected.length;
+      const numRows = this.dsMasivos.data.length;
+      return numSelected === numRows;
+    } else {
+      return 0;
+    }
+  }
+
+  /** Selects all rows if they are not all selected; otherwise clear selection. */
+  masterToggle() {
+    this.isAllSelected() ?
+        this.selection.clear() :
+        this.dsMasivos.data.forEach(row => this.selection.select(row));
+  }
+
+  /** The label for the checkbox on the passed row */
+  checkboxLabel( row? ): string {
+    if (!row) {
+      return `${this.isAllSelected() ? 'select' : 'deselect'} all`;
+    }
+    return `${this.selection.isSelected(row) ? 'deselect' : 'select'} row ${row.position + 1}`;
+  }
+
+  isSelected() {
+    for (const s of this.selection.selected ) {
+      console.log(s);
+        // if (s['docId'] == row.docId) {
+        //     return true;
+        // }
+    }
+  }
+
+  async cambiodeEstadoMasivo() {
+    // limpiar para asignar
+    this.login.estados.forEach( element => {
+        element.id_estado = 0;
+        element.marcada   = false;
+        element.anterior  = false;
+        element.nombre    = '';
+        element.fecha_entera = null;
+    });
+    //
+    this.cerrarPQT = false;
+    this.estados = this.login.estados;
+    this.estadosPqt = [];
+    this.buscandoRetiros = true;
+    //
+  }
+
+  updateEstadosMasivos() {
+    const texto = 'Esta acción actualizará los estados de todas las encomienda marcadas en el sistema' + (this.cerrarPQT) ? '. Y cerrará los registros. Está de acuerdo?' : '';
+    Swal.fire({
+      title: 'Grabaremos...',
+      text: texto,
+      icon: 'warning',
+      showCancelButton: true,
+      cancelButtonText: 'No, abandonar...',
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Sí, actualizar!'
+    }).then((result) => {
+      if (result.value) {
+        this.grabarEstadosMasivos();
+      }
+    });
+  }
+
+  async grabarEstadosMasivos() {
+    this.buscandoRetiros = true;
+    // origen
+    const carga = { id_paquete: this.idpqt,
+                    cierre: this.cerrarPQT,
+                    estados: this.estados };
+    //
+    await this.stockSS.servicioWEB( '/grabarEstados', carga )
+      .subscribe( (data: any) => {
+          //
+          this.buscandoRetiros = false;
+          //
+          // console.log(data);
+          if ( data.resultado === 'ok' ) {
+            //
+            Swal.fire({
+              icon: 'success',
+              title: 'Nro.Encomienda: ' + data.datos[0].id_pqt,
+              text: 'El cambio de estado de la encomienda fue grabado con éxito',
+              footer: '<a href>Nro.Interno : ' + data.datos[0].id_pqt + ' </a>'
+            });
+            //
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Cuidado...',
+              text: 'Los datos de cambio de estado de la encomienda no fueron grabados',
+              footer: '<a href>' + data.datos + '</a>'
+            });
+          }
+      });
+  }  
 }
+

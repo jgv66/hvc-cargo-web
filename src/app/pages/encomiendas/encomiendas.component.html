@@ -5,6 +5,7 @@
         <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true"><b>Pendientes</b></a>
         <a class="nav-item nav-link" id="nav-follow-tab" data-toggle="tab" href="#nav-follow" role="tab" aria-controls="nav-seguimiento" aria-selected="false"><b>Seguimientos</b></a>
         <a class="nav-item nav-link" id="nav-busquedas-tab" data-toggle="tab" href="#nav-busquedas" role="tab" aria-controls="nav-busquedas" aria-selected="false"><b>Buscar</b></a>
+        <a class="nav-item nav-link" id="nav-masivos-tab" data-toggle="tab" href="#nav-masivos" role="tab" aria-controls="nav-masivos" aria-selected="false"><b>Cambios Masivos</b></a>
     </div>
 </nav>
 <div class="tab-content" id="nav-tabContent">
@@ -153,7 +154,7 @@
                     </button>
                 </mat-form-field>
             </div>
-            <div class="col-1" style="max-height: 50px; height: 50px;margin-left:10px;margin-top:20px;">
+            <div class="col-2" style="max-height: 50px; height: 50px;margin-left:10px;margin-top:20px;">
                 <button type="button" class="btn btn-block btn-primary" (click)="cargarDatosPendientes()">
                     <i class="mdi mdi-refresh mdi-12px"></i>Refrescar
                 </button>
@@ -310,7 +311,7 @@
     <!-- busquedas -->
     <div class="tab-pane fade" id="nav-busquedas" role="tabpanel" aria-labelledby="nav-busquedas-tab">
         <div classs="card" style="margin-top: 5px;">
-            <form (ngSubmit)="buscarPaquetes()">
+            <form (ngSubmit)="buscarPaquetes('buscar')">
                 <div class="form-row mt-2 mb-2">
                     <div class="col-2" style="padding-left: 20px;">
                         <mat-form-field appearance="" style="max-height: 50px; height: 50px;width:125px;">
@@ -447,7 +448,7 @@
                                 </button>
                         </mat-form-field>
                     </div>
-                    <div class="col-1" style="max-height: 50px; height: 50px;margin-left:70px;">
+                    <div class="col-2" style="max-height: 50px; height: 50px;margin-left:70px;">
                         <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Buscar</button>
                     </div>
                 </div>
@@ -457,6 +458,10 @@
             </div>
             <mat-table [dataSource]="dsSeguimiento" style="margin-top: -10px;" class="mat-elevation-z8">
                 <ng-container matColumnDef="id">
+                    <mat-header-cell *matHeaderCellDef> #ID </mat-header-cell>
+                    <mat-cell *matCellDef="let element"> #{{element.id}} </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="id_paquete">
                     <mat-header-cell *matHeaderCellDef> #Seguimiento </mat-header-cell>
                     <mat-cell *matCellDef="let element"> #{{element.id_paquete}} </mat-cell>
                 </ng-container>
@@ -479,6 +484,80 @@
                 <mat-header-row *matHeaderRowDef="dispColSeguimiento"></mat-header-row>
                 <mat-row *matRowDef="let row; columns: dispColSeguimiento;"></mat-row>
             </mat-table>
+        </div>
+    </div>
+    <!-- masivos -->
+    <div class="tab-pane fade" id="nav-masivos" role="tabpanel" aria-labelledby="nav-masivos-tab">
+        <div classs="card" style="margin-top: 5px;">
+            <form (ngSubmit)="buscarPaquetes('masivo')">
+                <div class="form-row mt-2 mb-2">
+                    <div class="col-2" style="padding-left: 20px;">
+                        <mat-form-field appearance="" style="max-height: 50px; height: 50px;width:125px;">
+                            <mat-label>#Id Inicial</mat-label>
+                            <input matInput type="number" name="idIni" [(ngModel)]="idIni">
+                        </mat-form-field>
+                    </div>
+                    <div class="col-2">
+                        <mat-form-field color="accent" appearance="" style="max-height: 50px; height: 50px;width:125px;">
+                            <mat-label>#Id Final</mat-label>
+                            <input matInput type="number" name="idFin" [(ngModel)]="idFin">
+                        </mat-form-field>
+                    </div>
+                    <div class="col-2" style="max-height: 50px; height: 50px;">
+                        <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Buscar para Actualizar</button>
+                    </div>
+                    <div class="col-2" style="max-height: 50px; height: 50px;margin-left:20px; top:-9px; right:45px;" *ngIf=" filasMasivos>0 && selection.selected.length ">
+                        <a *ngIf=" login.usuario.admin " (click)="cambiodeEstadoMasivo()" data-toggle="modal" data-target="#EditEstadosMasivos" class="has-arrow waves-effect text-dark" style="margin-top:10px;">
+                            <b><i class="mdi mdi-checkbox-marked-circle-outline mdi-48px "></i></b>
+                        </a>
+                    </div>
+                </div>
+            </form>
+            <div class="progress" *ngIf=" buscando ">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%;height: 5px;"></div>
+            </div>
+            <div class="fix-container">
+                <mat-table [dataSource]="dsMasivos" style="margin-top: -10px;" class="mat-elevation-z8">
+                    <ng-container matColumnDef="select">
+                        <mat-header-cell *matHeaderCellDef style="max-width: 80px;width: 80px;">
+                            <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()" [indeterminate]="selection.hasValue() && !isAllSelected()" [aria-label]="checkboxLabel()"></mat-checkbox>
+                        </mat-header-cell>
+                        <mat-cell *matCellDef="let row" style="max-width: 80px;width: 80px;">
+                            <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)" [aria-label]="checkboxLabel(row)"></mat-checkbox>
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="id_paquete">
+                        <mat-header-cell *matHeaderCellDef style="max-width: 100px;width: 100px;"> #Id </mat-header-cell>
+                        <mat-cell *matCellDef="let element" style="max-width: 100px;width: 100px;"><b> #{{element.id_paquete}} </b></mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="fecha_creacion">
+                        <mat-header-cell *matHeaderCellDef style="max-width: 150px;width: 150px;">Fecha Creación</mat-header-cell>
+                        <mat-cell *matCellDef="let element" style="max-width: 150px;width: 150px;"> {{element.fecha_creacion}} </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="obs_carga">
+                        <mat-header-cell *matHeaderCellDef style="max-width: 150px;width: 150px;"> Encomienda </mat-header-cell>
+                        <mat-cell *matCellDef="let element" style="max-width: 150px;width: 150px;"> {{element.obs_carga}} </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="cli_razon">
+                        <mat-header-cell *matHeaderCellDef style="max-width: 400px;width: 400px;"> Cliente </mat-header-cell>
+                        <mat-cell *matCellDef="let element" style="max-width: 400px;width: 400px;"> {{element.cli_razon}} </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="des_razon">
+                        <mat-header-cell *matHeaderCellDef style="max-width: 400px;width: 400px;"> Destinatario </mat-header-cell>
+                        <mat-cell *matCellDef="let element" style="max-width: 400px;width: 400px;"> {{element.des_razon}} </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="tipo_pago">
+                        <mat-header-cell *matHeaderCellDef style="max-width: 180px;width: 180px;"> Cobro </mat-header-cell>
+                        <mat-cell *matCellDef="let element" style="max-width: 180px;width: 180px;font-weight: bold; color: red"> {{element.tipo_pago}} </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="estado">
+                        <mat-header-cell *matHeaderCellDef style="max-width: 200px;width: 200px;"> Estado </mat-header-cell>
+                        <mat-cell *matCellDef="let element" style="max-width: 200px;width: 200px;"> {{element.estado}} </mat-cell>
+                    </ng-container>
+                    <mat-header-row *matHeaderRowDef="dispMasivos; sticky: true"></mat-header-row>
+                    <mat-row *matRowDef="let row; columns: dispMasivos;" (click)="selection.toggle(row)"></mat-row>
+                </mat-table>
+            </div>
         </div>
     </div>
 </div>
@@ -852,4 +931,65 @@
         </div>
     </div>
 </div>
+<!-- Modal cambio de estados masivos de la encomienda -->
+<div class="modal fade" id="EditEstadosMasivos" tabindex="-1" role="dialog" aria-labelledby="EditEstadosMasivosLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
+        <div class="modal-content" style="width:670px;">
+            <div class="modal-header">
+                <h4 class="modal-title" id="ModalCenteredCrearLabel">Estados de las Encomiendas <b>MASIVO</b></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body modal-body-scroll">
+                <table class="table table-sm table-striped table-condensed" cellpadding="0" cellspacing="0">
+                    <thead class="bg-dark text-light">
+                        <tr translate="no">
+                            <th scope="col" style="width:40px;"> </th>
+                            <th scope="col" style="width:90px;">Estado</th>
+                            <th scope="col" style="width:240px;">Descripción</th>
+                            <th scope="col" style="width:270px;">Usuario asignado</th>
+                            <th scope="col" style="width:40px;"> </th>
+                        </tr>
+                    </thead>
+                    <tbody translate="no" class="text-dark fuente75">
+                        <tr *ngFor="let item of estados">
+                            <td>
+                                <a (click)="cambiandoEstado(item)" class="has-arrow waves-effect text-dark" style="margin-top:10px;">
+                                    <i *ngIf="  item.marcada " class="mdi mdi-check mdi-24px"></i>
+                                    <i *ngIf=" !item.marcada " class="mdi mdi-checkbox-blank-circle-outline mdi-24px"></i>
+                                </a>
+                            </td>
+                            <td scope="row" class="sinBorde">
+                                <p>{{item.estado}}</p>
+                            </td>
+                            <td scope="row" class="sinBorde">
+                                <p>{{ item.descripcion }}</p>
+                            </td>
+                            <td scope="row" class="sinBorde">
+                                <p>{{ item.nombre }}</p>
+                            </td>
+                            <td scope="row" class="sinBorde">
+                                <a *ngIf=" item.marcada " (click)="cambiarUsuario( item )" data-toggle="modal" data-target="#buscarUsuario" class="has-arrow waves-effect text-dark">
+                                    <i class="mdi mdi-account-search mdi-24px"></i>
+                                </a>&nbsp;
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <div class="custom-control custom-checkbox text-left">
+                    <input type="checkbox" class="custom-control-input" id="customCheck1" name="cerrarPQT" [(ngModel)]="cerrarPQT">
+                    <label class="custom-control-label" for="customCheck1" style="left:-70px;"><b>Cerrar Encomiendas Marcadas</b></label>
+                </div>
+                <div class="custom-control text-right">
+                    <button type="button" class="btn btn-secondary text-right" data-dismiss="modal" style="margin-right: 10px;">Abandonar</button>
+                    <button type="button" class="btn btn-primary text-right" data-dismiss="modal" (click)="updateEstadosMasivos()">Actualizar Estado</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- fin modal -->

@@ -7,7 +7,7 @@ import {MatInputModule,
         MatNativeDateModule,
         MatDatepickerModule,
         MAT_DATE_LOCALE,
-        MatListModule
+        MatListModule,
 } from '@angular/material';
 
 // import { MatButtonModule } from '@angular/material/button';
@@ -17,6 +17,7 @@ import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatIconModule} from '@angular/material/icon';
 import {MatSortModule} from '@angular/material';
+import {MatCheckboxModule} from '@angular/material/checkbox';
 
 @NgModule({
     providers: [
@@ -35,7 +36,8 @@ import {MatSortModule} from '@angular/material';
       MatProgressSpinnerModule,
       MatIconModule,
       MatListModule,
-      MatSortModule
+      MatSortModule,
+      MatCheckboxModule
       ],
     exports: [
       MatButtonModule,
@@ -50,7 +52,8 @@ import {MatSortModule} from '@angular/material';
       MatProgressSpinnerModule,
       MatIconModule,
       MatListModule,
-      MatSortModule
+      MatSortModule,
+      MatCheckboxModule
     ],
   })
 

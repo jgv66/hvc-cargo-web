@@ -30,7 +30,7 @@ export class LoginComponent implements OnInit {
   }
 
   ingresar() {
-    console.log('ingresando....');
+    // console.log('ingresando....');
   }
 
   doLogin() {
@@ -44,7 +44,7 @@ export class LoginComponent implements OnInit {
       )
       .subscribe(
           data => { try {
-                      console.log(data);
+                      // console.log(data);
                       if ( data.id ) {
                         this.loginService.put( data );  /* esta accion gatilla el relleno de datos */
                         this.router.navigate(['/dashboard']);
