@@ -45,7 +45,7 @@ export class EncomiendasComponent implements OnInit {
   dispColumns: string[] = ['id_paquete', 'fecha_creacion', 'obs_carga', 'cli_razon', 'des_razon', 'tipo_pago', 'estado', 'acciones'];
   dispColClientes: string[] = ['rut', 'razon_social', 'direccion', 'telefono1', 'email', 'acciones'];
   dispColSeguimiento: string[] = ['id', 'id_paquete', 'fecha', 'hora', 'usuario', 'notas'];
-  dispMasivos: string[] = ['select', 'id_paquete', 'fecha_creacion', 'obs_carga', 'cli_razon', 'des_razon', 'tipo_pago', 'estado'];
+  dispMasivos: string[] = ['select', 'estado', 'id_paquete', 'fecha_creacion', 'obs_carga', 'cli_razon', 'des_razon', 'tipo_pago'];
 
   expandedElementR: any;
   expandedElementB: any;
@@ -57,6 +57,8 @@ export class EncomiendasComponent implements OnInit {
   buscando = false;
   buscandoChico = false;
   buscandoRetiros = false;
+  buscandoMasivo = false;
+  marcaRojo = true;
   busquedas = false;
   enProceso = false;
   grabandoEnco = false;
@@ -549,7 +551,7 @@ export class EncomiendasComponent implements OnInit {
     }
   }
 
-  async cambiodeEstado( item ) {
+  cambiodeEstado( item ) {
     // limpiar para asignar
     this.login.estados.forEach( element => {
         element.id_estado = 0;
@@ -649,9 +651,10 @@ export class EncomiendasComponent implements OnInit {
   async grabarEstados() {
     this.buscandoRetiros = true;
     // origen
+    const marcados = this.estados.filter( item => item.marcada === true );
     const carga = { id_paquete: this.idpqt,
                     cierre: this.cerrarPQT,
-                    estados: this.estados };
+                    estados: marcados };
     //
     await this.stockSS.servicioWEB( '/grabarEstados', carga )
       .subscribe( (data: any) => {
@@ -681,6 +684,7 @@ export class EncomiendasComponent implements OnInit {
 
   buscarPaquetes( caso: string ) {
     this.buscando = true;
+    this.buscandoMasivo = true;
     this.stockSS.servicioWEB( (caso === 'buscar' ) ? '/dameEncomiendas' : '/dameMasivo',
                              {  ficha: this.login.usuario.id,
                                 idCliente: 0, idDestina: 0,
@@ -689,8 +693,8 @@ export class EncomiendasComponent implements OnInit {
                                 fechaIni: this.guias.fechaNormal( this.fechaIni ) ,
                                 fechaFin: this.guias.fechaNormal( this.fechaFin ) } )
         .subscribe( (dev: any) => {
-            console.log(dev);
             this.buscando = false;
+            this.buscandoMasivo = false;
             if ( dev.resultado === 'error' || dev.resultado === 'nodata' ) {
               Swal.fire('No existen encomiendas para los parámetros entregados.');
             } else {
@@ -705,7 +709,6 @@ export class EncomiendasComponent implements OnInit {
                 this.dsMasivos = new MatTableDataSource(rows);
                 this.selection = new SelectionModel<Element>(true, []);
                 this.filasMasivos = dev.datos.length;
-                // this.dsMasivos.paginator = this.paginator.toArray()[2];
               }
             }
         },
@@ -730,15 +733,11 @@ export class EncomiendasComponent implements OnInit {
       return 0;
     }
   }
-
-  /** Selects all rows if they are not all selected; otherwise clear selection. */
   masterToggle() {
     this.isAllSelected() ?
         this.selection.clear() :
         this.dsMasivos.data.forEach(row => this.selection.select(row));
   }
-
-  /** The label for the checkbox on the passed row */
   checkboxLabel( row? ): string {
     if (!row) {
       return `${this.isAllSelected() ? 'select' : 'deselect'} all`;
@@ -746,16 +745,7 @@ export class EncomiendasComponent implements OnInit {
     return `${this.selection.isSelected(row) ? 'deselect' : 'select'} row ${row.position + 1}`;
   }
 
-  isSelected() {
-    for (const s of this.selection.selected ) {
-      console.log(s);
-        // if (s['docId'] == row.docId) {
-        //     return true;
-        // }
-    }
-  }
-
-  async cambiodeEstadoMasivo() {
+  cambiodeEstadoMasivo() {
     // limpiar para asignar
     this.login.estados.forEach( element => {
         element.id_estado = 0;
@@ -771,7 +761,6 @@ export class EncomiendasComponent implements OnInit {
     this.buscandoRetiros = true;
     //
   }
-
   updateEstadosMasivos() {
     const texto = 'Esta acción actualizará los estados de todas las encomienda marcadas en el sistema' + (this.cerrarPQT) ? '. Y cerrará los registros. Está de acuerdo?' : '';
     Swal.fire({
@@ -789,38 +778,36 @@ export class EncomiendasComponent implements OnInit {
       }
     });
   }
-
-  async grabarEstadosMasivos() {
-    this.buscandoRetiros = true;
+  grabarEstadosMasivos() {
+    this.buscandoMasivo = true;
+    this.marcaRojo = true;
     // origen
-    const carga = { id_paquete: this.idpqt,
-                    cierre: this.cerrarPQT,
-                    estados: this.estados };
+    let todoOk = false;
+    let carga = {};
+    const marcados = this.estados.filter( item => item.marcada === true );
     //
-    await this.stockSS.servicioWEB( '/grabarEstados', carga )
-      .subscribe( (data: any) => {
+    for (const s of this.selection.selected ) {
+      //
+      carga = { id_paquete: s.id_paquete,
+                cierre:     this.cerrarPQT,
+                estados:    marcados };
+      //
+      this.stockSS.servicioWEB('/grabarEstados', carga)
+        .subscribe((data: any) => {
           //
-          this.buscandoRetiros = false;
-          //
-          // console.log(data);
-          if ( data.resultado === 'ok' ) {
-            //
-            Swal.fire({
-              icon: 'success',
-              title: 'Nro.Encomienda: ' + data.datos[0].id_pqt,
-              text: 'El cambio de estado de la encomienda fue grabado con éxito',
-              footer: '<a href>Nro.Interno : ' + data.datos[0].id_pqt + ' </a>'
-            });
-            //
-          } else {
-            Swal.fire({
-              icon: 'error',
-              title: 'Cuidado...',
-              text: 'Los datos de cambio de estado de la encomienda no fueron grabados',
-              footer: '<a href>' + data.datos + '</a>'
-            });
+          if (data.resultado === 'ok') {
+            this.dsMasivos.data = this.dsMasivos.data.filter( item => item.id_paquete !== s.id_paquete );
           }
-      });
-  }  
+        },
+        (error) => {
+          console.log(error);
+        });
+      //
+    }
+    this.buscandoMasivo = false;
+    this.marcaRojo = false;
+    //
+  }
+
 }
 

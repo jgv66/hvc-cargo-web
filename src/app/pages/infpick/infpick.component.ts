@@ -56,7 +56,7 @@ export class InfpickComponent implements OnInit {
     const salida = [];
     this.retiros.forEach( elem => {
       salida.push({ encomienda: elem.id_paquete, cliente: elem.cliente, destinatario: elem.destinatario, obs_carga: elem.obs_carga,
-                    peso: elem.peso, volumen: elem.volumen, bultos: elem.bultos, valor: elem.valor,
+                    peso: elem.peso, volumen: elem.volumen, bultos: elem.bultos, valor: elem.valor_cobrado,
                     tipo_pago: elem.tipo_pago, desc_pago: elem.desc_pago, fecha_creacion: elem.fecha_creacion, cli_razon: elem.cli_razon,
                     cli_direccion: elem.cli_direccion, cli_comuna: elem.cli_comuna, cli_fono: elem.cli_fono1,
                     des_razon: elem.des_razon, des_direccion: elem.des_direccion, des_comuna: elem.des_comuna,
@@ -81,7 +81,7 @@ export class InfpickComponent implements OnInit {
                                                     fechaIni: this.guias.fechaNormal( this.fechaIni ) ,
                                                     fechaFin: this.guias.fechaNormal( this.fechaFin ) } )
         .subscribe( (dev: any) => {
-            // console.log(dev);
+            console.log(dev);
             this.cargando = false;
             if ( dev.resultado === 'error' || dev.resultado === 'nodata' ) {
               Swal.fire('No existen encomiendas para los parámetros entregados.');

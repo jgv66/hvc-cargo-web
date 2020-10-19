@@ -42,24 +42,31 @@ export class LoginComponent implements OnInit {
           retry( 2 ),
           map( (data: any) => data.datos[0] )
       )
-      .subscribe(
-          data => { try {
-                      // console.log(data);
-                      if ( data.id ) {
-                        this.loginService.put( data );  /* esta accion gatilla el relleno de datos */
-                        this.router.navigate(['/dashboard']);
-                      }
-                    } catch (error) {
-                      Swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        text: 'Email/Password no coinciden',
-                        footer: '<a href>Corrija y reintente</a>'
-                      });
-                    }
+      .subscribe( data => {
+          console.log(data);
+          try {
+            if ( data.id ) {
+              this.loginService.put( data );  /* esta accion gatilla el relleno de datos */
+              this.router.navigate(['/dashboard']);
+            }
+          } catch (error) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Oops...',
+              text: 'Email/Password no coinciden',
+              footer: '<a href>Corrija y reintente</a>'
+            });
+          }
+      },
+        (err) => { this.cargando = false;
+                   Swal.fire({
+                      icon: 'error',
+                      title: 'Oops...',
+                      text: 'Email/Password no coinciden',
+                      footer: '<a href>Corrija y reintente</a>'
+                   });
+                   console.log( 'Err', err );
                   },
-              err  => console.log( 'Err', err ),
-              ()   => { this.cargando = false; }
       );
       this.yaEstoy = false;
     }
