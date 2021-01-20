@@ -532,7 +532,7 @@ export class EncomiendasComponent implements OnInit {
   async buscarPaquete( cambio? ) {
     if ( this.idpqt !== 0 ) {
       this.buscandoID = true;
-      await this.stockSS.servicioWEB( '/estado_pqt', { idpqt: this.idpqt } )
+      await this.stockSS.servicioWEB( '/estado_pqt', { idpqt: this.idpqt, interno: 1 } )
         .subscribe( (dev: any) => {
             // console.log(dev);
             this.buscandoID = false;
