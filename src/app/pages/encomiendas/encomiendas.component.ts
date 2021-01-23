@@ -71,7 +71,7 @@ export class EncomiendasComponent implements OnInit {
   carga: any = {};
   clienteChico = [];
   fecha: Date;
-  foto;
+  lasFotos = [];
   idfoto;
   nombreorut = '';
   buscarCliente = '';
@@ -88,6 +88,10 @@ export class EncomiendasComponent implements OnInit {
   fechaFin = new Date();
   idIni = 0;
   idFin = 0;
+
+  nBuscarPor = 'fecha';
+  nIdIni;
+  nIdFin;
 
   constructor( private router: Router,
                public login: LoginService,
@@ -300,21 +304,26 @@ export class EncomiendasComponent implements OnInit {
         });
   }
 
+  cargarFotoFea( idpqt ) {
+    this.cargarFoto( { idpqt } );
+  }
+
   cargarFoto( item ) {
-    this.foto   = undefined;
+    this.lasFotos = [];
     this.idfoto = undefined;
     this.cargando = true;
     const IMG_URL = this.stockSS.url + '/public/img/' ;
-    // console.log(IMG_URL);
-    // console.log(item.id_paquete);
-    this.stockSS.servicioWEB( '/getimages', { id_pqt: item.id_paquete } )
+    //
+    this.stockSS.servicioWEB( '/getimages', { id_pqt: item.idpqt } )
         .subscribe( (dev: any) => {
           this.cargando = false;
-          // console.log(dev);
+          //
           if ( dev.resultado === 'ok' ) {
-            this.idfoto = item.id_paquete;
-            this.foto   = IMG_URL + dev.datos[0].imgb64;
-            // console.log(this.foto);
+            this.idfoto = item.idpqt;
+            dev.datos.forEach( element => {
+              element.imgb64 = IMG_URL + element.imgb64;
+            })
+            this.lasFotos = dev.datos;
           }
         });
   }
@@ -567,7 +576,7 @@ export class EncomiendasComponent implements OnInit {
     this.buscandoRetiros = true;
     this.idpqt = item.id_paquete;
     //
-    this.stockSS.servicioWEB( '/estado_pqt', { idpqt: this.idpqt } )
+    this.stockSS.servicioWEB( '/estado_pqt', { idpqt: this.idpqt, interno: 1 } )
       .subscribe( (dev: any) => {
         this.buscandoRetiros = false;
         if ( dev.resultado === 'ok' ) {
@@ -687,9 +696,11 @@ export class EncomiendasComponent implements OnInit {
     this.buscandoMasivo = true;
     this.stockSS.servicioWEB( (caso === 'buscar' ) ? '/dameEncomiendas' : '/dameMasivo',
                              {  ficha: this.login.usuario.id,
-                                idCliente: 0, idDestina: 0,
-                                idIni: this.idIni,
-                                idFin: this.idFin,
+                                idCliente: 0, 
+                                idDestina: 0,
+                                filtro: this.nBuscarPor,
+                                idIni: (caso === 'buscar' ) ? this.nIdIni : this.idIni,
+                                idFin: (caso === 'buscar' ) ? this.nIdFin : this.idFin,
                                 fechaIni: this.guias.fechaNormal( this.fechaIni ) ,
                                 fechaFin: this.guias.fechaNormal( this.fechaFin ) } )
         .subscribe( (dev: any) => {
@@ -706,9 +717,9 @@ export class EncomiendasComponent implements OnInit {
                 this.dsBusquedas.paginator = this.paginator.toArray()[2];
               } else {
                 dev.datos.forEach(element => rows.push(element));
+                this.filasMasivos = dev.datos.length;
                 this.dsMasivos = new MatTableDataSource(rows);
                 this.selection = new SelectionModel<Element>(true, []);
-                this.filasMasivos = dev.datos.length;
               }
             }
         },

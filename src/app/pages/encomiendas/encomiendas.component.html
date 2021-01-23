@@ -3,8 +3,8 @@
         <a class="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#nav-contact" role="tab" aria-controls="nav-contact" aria-selected="false"><b>Nueva Encomienda</b></a>
         <a class="nav-item nav-link" id="nav-cliente-tab" data-toggle="tab" href="#nav-cliente" role="tab" aria-controls="nav-ccliente" aria-selected="false"><b>Clientes</b></a>
         <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true"><b>Pendientes</b></a>
-        <a class="nav-item nav-link" id="nav-follow-tab" data-toggle="tab" href="#nav-follow" role="tab" aria-controls="nav-seguimiento" aria-selected="false"><b>Seguimientos</b></a>
         <a class="nav-item nav-link" id="nav-busquedas-tab" data-toggle="tab" href="#nav-busquedas" role="tab" aria-controls="nav-busquedas" aria-selected="false"><b>Buscar</b></a>
+        <a class="nav-item nav-link" id="nav-follow-tab" data-toggle="tab" href="#nav-follow" role="tab" aria-controls="nav-seguimiento" aria-selected="false"><b>Seguimientos</b></a>
         <a class="nav-item nav-link" id="nav-masivos-tab" data-toggle="tab" href="#nav-masivos" role="tab" aria-controls="nav-masivos" aria-selected="false"><b>Cambios Masivos</b></a>
     </div>
 </nav>
@@ -312,7 +312,15 @@
         <div classs="card" style="margin-top: 5px;">
             <form (ngSubmit)="buscarPaquetes('buscar')">
                 <div class="form-row mt-2 mb-2">
-                    <div class="col-2" style="padding-left: 20px;">
+                    <section class="col-2.8">
+                        <label class="example-margin">Buscar por:</label>
+                        <mat-radio-group name="nBuscarPor" [(ngModel)]="nBuscarPor">
+                            <mat-radio-button style="padding-top: 10px;" class="example-margin" value="fecha">Fecha</mat-radio-button>
+                            <mat-radio-button class="example-margin" value="numero">Número</mat-radio-button>
+                        </mat-radio-group>
+                    </section>
+                    <!-- seleccion por fecha -->
+                    <div class="col-2" style="padding-left: 20px;" [hidden]="nBuscarPor==='numero'">
                         <mat-form-field appearance="" style="max-height: 50px; height: 50px;width:125px;">
                             <mat-label>Fecha inicial</mat-label>
                             <input matInput [matDatepicker]="picker" name="fechaIni" [(ngModel)]="fechaIni">
@@ -320,7 +328,7 @@
                             <mat-datepicker #picker></mat-datepicker>
                         </mat-form-field>
                     </div>
-                    <div class="col-2">
+                    <div class="col-2" [hidden]="nBuscarPor==='numero'">
                         <mat-form-field color="accent" appearance="" style="max-height: 50px; height: 50px;width:125px;">
                             <mat-label>Fecha final</mat-label>
                             <input matInput [matDatepicker]="picker2" name="fechaFin" [(ngModel)]="fechaFin">
@@ -328,10 +336,24 @@
                             <mat-datepicker #picker2></mat-datepicker>
                         </mat-form-field>
                     </div>
-                    <div class="col-2" style="max-height: 50px; height: 50px;">
+                    <!-- seleccion por numero de encomienda -->
+                    <div class="col-2" style="padding-left: 20px;" [hidden]="nBuscarPor==='fecha'">
+                        <mat-form-field appearance="" style="max-height: 50px; height: 50px;width:125px;">
+                            <mat-label>#Id Inicial</mat-label>
+                            <input matInput type="number" name="nIdIni" [(ngModel)]="nIdIni">
+                        </mat-form-field>
+                    </div>
+                    <div class="col-1.5" [hidden]="nBuscarPor==='fecha'">
+                        <mat-form-field color="accent" appearance="" style="max-height: 50px; height: 50px;width:125px;">
+                            <mat-label>#Id Final</mat-label>
+                            <input matInput type="number" name="nIdFin" [(ngModel)]="nIdFin">
+                        </mat-form-field>
+                    </div>
+
+                    <div class="col-1.5" style="max-height: 50px; height: 50px;">
                         <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Buscar Encomiendas</button>
                     </div>
-                    <div class="col-4" *ngIf=" filasBusqueda > 0 ">
+                    <div class="col-3" *ngIf=" filasBusqueda > 0 ">
                         <mat-form-field *ngIf=" filasBusqueda > 0 ">
                             <mat-label>Filtrar</mat-label>
                             <input matInput (keyup)="aplicarFiltroBusquedasB( $event )" placeholder="digite algo..." #input>
@@ -377,6 +399,9 @@
                         <a *ngIf=" login.usuario.admin " (click)="revisarEncomienda( item )" data-toggle="modal" data-target="#EditEncomienda" class="has-arrow waves-effect text-dark" style="margin-top:10px;">
                             <i class="mdi mdi-lead-pencil mdi-24px"></i>
                         </a>&nbsp;
+                        <a *ngIf=" login.usuario.admin " (click)="cargarFoto( item )" data-toggle="modal" data-target="#ImagenModal" class="has-arrow waves-effect text-dark" style="margin-top:10px;color:red;">
+                            <i class="mdi mdi-camera mdi-24px "></i>
+                        </a>&nbsp;
                         <a *ngIf=" login.usuario.admin " (click)="cambiodeEstado( item )" data-toggle="modal" data-target="#EditEstados" class="has-arrow waves-effect text-dark" style="margin-top:10px;">
                             <i class="mdi mdi-checkbox-marked-circle-outline mdi-24px "></i>
                         </a>&nbsp;
@@ -400,12 +425,12 @@
                                         <p><i class="mdi mdi-package-variant-closed mdi-18px"></i> {{ detail.element.bultos }} </p>
                                         <p><i class="mdi mdi-weight-kilogram mdi-18px"></i> {{ detail.element.peso | number:"1.0-2" }}Kg </p>
                                     </td>
-                                    <td scope="row" style="width: 270px;">
+                                    <td scope="row" style="width: 312px;">
                                         <p>{{ detail.element.cli_direccion }}, {{ detail.element.cli_comuna}} </p>
                                         <p>{{ detail.element.contacto }}</p>
                                         <p>{{ detail.element.cli_referencias }}</p>
                                     </td>
-                                    <td scope="row" style="width: 270px;">
+                                    <td scope="row" style="width: 315px;">
                                         <p>{{ detail.element.des_direccion }}, {{ detail.element.des_comuna}} </p>
                                     </td>
                                     <td style="max-width: 180px;width: 180px;padding-top: 18px; font-weight: bold; color: red" scope="row">
@@ -443,13 +468,16 @@
                             <mat-label>#Encomienda</mat-label>
                             <input matInput name="idpqt" [(ngModel)]="idpqt" placeholder="digite el ID de seguimiento...">
                             <button mat-button *ngIf="idpqt" matSuffix mat-icon-button aria-label="Clear" (click)="idpqt=0">
-                                    <mat-icon>close</mat-icon>
-                                </button>
+                                <mat-icon>close</mat-icon>
+                            </button>
                         </mat-form-field>
                     </div>
                     <div class="col-2" style="max-height: 50px; height: 50px;margin-left:70px;">
                         <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Buscar</button>
                     </div>
+                    <a *ngIf=" login.usuario.admin && idpqt !== undefined && idpqt !== 0 " (click)="cargarFotoFea( idpqt )" data-toggle="modal" data-target="#ImagenModal" class="has-arrow waves-effect text-dark" style="margin-top:10px;color:red;">
+                        <i class="mdi mdi-camera mdi-24px "></i>
+                    </a>&nbsp;
                 </div>
             </form>
             <div class="progress" *ngIf=" buscandoID ">
@@ -565,13 +593,14 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content" style="width: 670px;">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Imagen del Retiro ( <b>#{{ idfoto }}</b> )</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Imagen de Encomienda <b>( #{{ idfoto }} )</b></h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
-            <div class="modal-body">
-                <img [src]="foto" style="width: 100%;">
+            <div class="modal-body" *ngFor="let foto of lasFotos">
+                <p>Fecha {{ foto.fecha }} - Hora {{ foto.hora }}</p>
+                <img [src]="foto.imgb64" style="width: 100%;">
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>

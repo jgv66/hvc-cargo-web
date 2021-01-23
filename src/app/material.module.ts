@@ -8,6 +8,7 @@ import {MatInputModule,
         MatDatepickerModule,
         MAT_DATE_LOCALE,
         MatListModule,
+        MatRadioModule,
 } from '@angular/material';
 
 // import { MatButtonModule } from '@angular/material/button';
@@ -37,7 +38,8 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
       MatIconModule,
       MatListModule,
       MatSortModule,
-      MatCheckboxModule
+      MatCheckboxModule,
+      MatRadioModule,
       ],
     exports: [
       MatButtonModule,
@@ -53,7 +55,8 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
       MatIconModule,
       MatListModule,
       MatSortModule,
-      MatCheckboxModule
+      MatCheckboxModule,
+      MatRadioModule
     ],
   })
 
