@@ -305,7 +305,7 @@ export class EncomiendasComponent implements OnInit {
   }
 
   cargarFotoFea( idpqt ) {
-    this.cargarFoto( { idpqt } );
+    this.cargarFoto( { idpqt, id_paquete: idpqt } );
   }
 
   cargarFoto( item ) {
@@ -314,12 +314,12 @@ export class EncomiendasComponent implements OnInit {
     this.cargando = true;
     const IMG_URL = this.stockSS.url + '/public/img/' ;
     //
-    this.stockSS.servicioWEB( '/getimages', { id_pqt: item.idpqt } )
+    this.stockSS.servicioWEB( '/getimages', { id_pqt: item.id_paquete } )
         .subscribe( (dev: any) => {
           this.cargando = false;
           //
           if ( dev.resultado === 'ok' ) {
-            this.idfoto = item.idpqt;
+            this.idfoto = item.id_paquete;
             dev.datos.forEach( element => {
               element.imgb64 = IMG_URL + element.imgb64;
             })

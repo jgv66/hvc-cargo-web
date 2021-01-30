@@ -2,7 +2,6 @@ import { environment } from '../../environments/environment';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 
-
 @Injectable({
   providedIn: 'root'
 })
@@ -22,8 +21,10 @@ export class StockService {
   }
 
   servicioWEB( cSP: string, parametros?: any ) {
-    const url    = this.url + cSP;
-    const body   = parametros;
+    console.log(cSP);
+    console.log(parametros);
+    const url  = this.url + cSP;
+    const body = parametros;
     return this.http.post( url, body );
   }
 

@@ -76,12 +76,14 @@ export class InfpickComponent implements OnInit {
     this.cargando = true;
     this.retiros  = [];
     this.filasPick = 0;
-    this.stockSS.servicioWEB( '/dameEncomiendas', { ficha: this.login.usuario.id,
+    // console.log('consulta 1',this.guias.fechaNormal( this.fechaIni ));
+    this.stockSS.servicioWEB( '/dameEncomiendas', { filtro: 'fecha',
+                                                    ficha: this.login.usuario.id,
                                                     idCliente: 0, idDestina: 0,
                                                     fechaIni: this.guias.fechaNormal( this.fechaIni ) ,
                                                     fechaFin: this.guias.fechaNormal( this.fechaFin ) } )
         .subscribe( (dev: any) => {
-            console.log(dev);
+            // console.log(dev);
             this.cargando = false;
             if ( dev.resultado === 'error' || dev.resultado === 'nodata' ) {
               Swal.fire('No existen encomiendas para los parámetros entregados.');
