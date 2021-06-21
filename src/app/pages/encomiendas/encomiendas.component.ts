@@ -1,17 +1,22 @@
 import { Component, OnInit, ViewChildren, QueryList } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgForm } from '@angular/forms';
-import { StockService } from '../../services/stock.service';
-import { LoginService } from '../../services/login.service';
-import { GuiasService } from '../../services/guias.service';
 // sweet alert
 import Swal from 'sweetalert2';
 // material
 import { MatTableDataSource } from '@angular/material';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
+import { MatDialog, MatDialogConfig } from '@angular/material/dialog';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { SelectionModel } from '@angular/cdk/collections';
+//
+import { map } from 'rxjs/operators';
+//
+import { StockService } from '../../services/stock.service';
+import { LoginService } from '../../services/login.service';
+import { GuiasService } from '../../services/guias.service';
+import { EncomiendaCmComponent } from '../encomienda-cm/encomienda-cm.component';
 
 @Component({
   selector: 'app-encomiendas',
@@ -44,7 +49,7 @@ export class EncomiendasComponent implements OnInit {
 
   dispColumns: string[] = ['id_paquete', 'fecha_creacion', 'obs_carga', 'cli_razon', 'des_razon', 'tipo_pago', 'estado', 'acciones'];
   dispColClientes: string[] = ['rut', 'razon_social', 'direccion', 'telefono1', 'email', 'acciones'];
-  dispColSeguimiento: string[] = ['id', 'id_paquete', 'fecha', 'hora', 'usuario', 'notas'];
+  dispColSeguimiento: string[] = ['id', 'id_paquete', 'fecha', 'hora', 'usuario', 'receptor', 'notas'];
   dispMasivos: string[] = ['select', 'estado', 'id_paquete', 'fecha_creacion', 'obs_carga', 'cli_razon', 'des_razon', 'tipo_pago'];
 
   expandedElementR: any;
@@ -95,6 +100,7 @@ export class EncomiendasComponent implements OnInit {
 
   constructor( private router: Router,
                public login: LoginService,
+               public dialog: MatDialog,
                private stockSS: StockService,
                private guias: GuiasService ) {}
 
@@ -123,7 +129,7 @@ export class EncomiendasComponent implements OnInit {
               this.dsRetiros = new MatTableDataSource(rows);
               this.dsRetiros.paginator = this.paginator.toArray()[0];
               this.dsRetiros.sort = this.sort.toArray()[0];
-              console.log(this.dsRetiros);
+              // console.log(this.dsRetiros);
             }
         },
         (error) => {
@@ -604,39 +610,6 @@ export class EncomiendasComponent implements OnInit {
       });
     //
   }
-  cambiarUsuario( item ) {
-    this.estaPosicion = item.estado;
-  }
-  esteUsuario( item ) {
-    if ( item.id > 0 || item.id === 0 ) {
-      this.estados.forEach( element => {
-        if ( element.estado === this.estaPosicion ) {
-          element.usuario = item.id;
-          element.nombre  = item.nombre;
-        }
-      });
-    }
-  }
-  cambiandoEstado( item ) {
-    if ( item.anterior === true ) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Cuidado...',
-        text: 'No puede deshacer un hecho pasado, solo puede cambiar el Usuario asignado',
-      });
-    } else {
-      item.marcada = !item.marcada;
-      if ( item.marcada ) {
-        item.usuario      = this.login.usuario.id;
-        item.nombre       = this.login.usuario.nombre;
-        item.fecha_entera = new Date();
-      } else {
-        item.usuario      = 0;
-        item.nombre       = '';
-        item.fecha_entera = null;
-      }
-    }
-  }
 
   updateEstados() {
     const texto = 'Esta acción actualizará los estados de la encomienda en el sistema' + (this.cerrarPQT) ? '. Y cerrará el registro. Está de acuerdo?' : '';
@@ -756,24 +729,8 @@ export class EncomiendasComponent implements OnInit {
     return `${this.selection.isSelected(row) ? 'deselect' : 'select'} row ${row.position + 1}`;
   }
 
-  cambiodeEstadoMasivo() {
-    // limpiar para asignar
-    this.login.estados.forEach( element => {
-        element.id_estado = 0;
-        element.marcada   = false;
-        element.anterior  = false;
-        element.nombre    = '';
-        element.fecha_entera = null;
-    });
-    //
-    this.cerrarPQT = false;
-    this.estados = this.login.estados;
-    this.estadosPqt = [];
-    this.buscandoRetiros = true;
-    //
-  }
   updateEstadosMasivos() {
-    const texto = 'Esta acción actualizará los estados de todas las encomienda marcadas en el sistema' + (this.cerrarPQT) ? '. Y cerrará los registros. Está de acuerdo?' : '';
+    const texto = 'Esta acción actualizará los estados de todas las encomiendas marcadas' + (this.cerrarPQT) ? '. Y cerrará los registros. Está de acuerdo?' : '.';
     Swal.fire({
       title: 'Grabaremos...',
       text: texto,
@@ -789,11 +746,53 @@ export class EncomiendasComponent implements OnInit {
       }
     });
   }
+
+  cambiarUsuario( item ) {
+    this.estaPosicion = item.estado;
+  }
+
+  cambiandoEstado( item ) {
+    if ( item.anterior === true ) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Cuidado...',
+        text: 'No puede deshacer un hecho pasado, solo puede cambiar el Usuario asignado',
+      });
+    } else {
+      item.marcada = !item.marcada;
+      if ( item.marcada ) {
+        item.usuario      = this.login.usuario.id;
+        item.nombre       = this.login.usuario.nombre;
+        item.fecha_entera = new Date();
+      } else {
+        item.usuario      = 0;
+        item.nombre       = '';
+        item.fecha_entera = null;
+      }
+    }
+  }
+
+  verCambiosMasivos() {
+    //
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.disableClose = false;
+    dialogConfig.autoFocus = false;
+    dialogConfig.width = '700px';
+    dialogConfig.height = '660px';
+    dialogConfig.data = {};
+    //
+    const dialogRef = this.dialog.open( EncomiendaCmComponent, dialogConfig );
+    //
+    dialogRef.afterClosed().subscribe(
+        data => console.log("Dialog output:", data)
+    );  
+    //
+  }
+
   grabarEstadosMasivos() {
     this.buscandoMasivo = true;
     this.marcaRojo = true;
     // origen
-    let todoOk = false;
     let carga = {};
     const marcados = this.estados.filter( item => item.marcada === true );
     //
@@ -818,6 +817,57 @@ export class EncomiendasComponent implements OnInit {
     this.buscandoMasivo = false;
     this.marcaRojo = false;
     //
+  }
+    
+  etq1() {
+    return `
+    ^XA
+    ^DFR:SAMPLE.GRF^FS
+    ^FO20,30^GB750,1100,4^FS
+    ^FO20,30^GB750,200,4^FS
+    ^FO20,30^GB750,400,4^FS
+    ^FO20,30^GB750,700,4^FS
+    ^FO20,226^GB325,204,4^FS
+    ^FO30,40^ADN,36,20^FDShip to:^FS
+    ^FO30,260^ADN,18,10^FDPart number #^FS
+    ^FO360,260^ADN,18,10^FDDescription:^FS
+    ^FO30,750^ADN,36,20^FDFrom:^FS
+    ^FO150,125^ADN,36,20^FN1^FS (ship to)
+    ^FO60,330^ADN,36,20^FN2^FS(part num)
+    ^FO400,330^ADN,36,20^FN3^FS(description)
+    ^FO70,480^BY4^B3N,,200^FN4^FS(barcode)
+    ^FO150,800^ADN,36,20^FN5^FS (from)
+    ^XZ
+    ^XA
+    ^XFR:SAMPLE.GRF
+    ^FN1^FDAcme Printing^FS
+    ^FN2^FD14042^FS
+    ^FN3^FDScrew^FS
+    ^FN4^FD12345678^FS
+    ^FN5^FDMacks Fabricating^FS
+    ^XZ    
+    `;
+  }
+
+  openWin() {
+    const printWindow = window.open();
+    printWindow.document.open('text/plain')
+    printWindow.document.write('${HIDROVORTICE}$');
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();  
+  }
+
+  imprimir( data ) {
+    data.spinn = true;
+    this.stockSS.imprimirOrden( data )
+      .pipe( map( (resp: any) => resp.datos ) )
+      .subscribe( (pdf: any) => {
+          setTimeout( () => {
+              data.spinn = false;
+              window.open( 'https://api.hvc.kinetik.cl/static/pdf/' + pdf );
+          }, 600);
+      });
   }
 
 }

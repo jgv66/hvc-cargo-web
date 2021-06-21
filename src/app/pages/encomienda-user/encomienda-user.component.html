@@ -1,0 +1,33 @@
+<div class="modal-header">
+    <h5 class="modal-title" id="exampleModalLabel">Usuarios del sistema</h5>
+    <button type="button" (click)="salir()">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body modal-body-scroll">
+    <table class="table table-sm table-striped table-condensed" cellpadding="0" cellspacing="0">
+        <thead class="bg-dark text-light">
+            <tr translate="no">
+                <th scope="col" style="width:250px;">Nombre</th>
+                <th scope="col" style="width:300px;">e-Mail</th>
+                <th scope="col" style="width:150px;">Teléfono</th>
+            </tr>
+        </thead>
+        <tbody translate="no" class="text-dark fuente75">
+            <tr *ngFor="let item of login.usuarios" (click)="esteUsuario( item )">
+                <td style="padding-top: 18px;" scope="row">
+                    <p>{{ item.nombre }}</p>
+                </td>
+                <td style="padding-top: 18px;" scope="row">
+                    <p>{{ item.email }}</p>
+                </td>
+                <td style="padding-top: 18px;" scope="row">
+                    <p>{{ item.telefono }}</p>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="salir()">Cerrar</button>
+</div>

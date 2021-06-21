@@ -20,6 +20,8 @@ import { EncomiendasComponent } from './encomiendas/encomiendas.component';
 import { OtComponent } from './ot/ot.component';
 import { InfpickComponent } from './infpick/infpick.component';
 import { ComponentsModule } from '../components/components.module';
+import { EncomiendaCmComponent } from './encomienda-cm/encomienda-cm.component';
+import { EncomiendaUserComponent } from './encomienda-user/encomienda-user.component';
 
 @NgModule({
     declarations: [
@@ -31,6 +33,8 @@ import { ComponentsModule } from '../components/components.module';
         EncomiendasComponent,
         OtComponent,
         InfpickComponent,
+        EncomiendaCmComponent,
+        EncomiendaUserComponent,
     ],
     exports: [
         DashboardComponent,

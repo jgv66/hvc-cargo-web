@@ -504,6 +504,10 @@
                     <mat-header-cell *matHeaderCellDef> Usuario </mat-header-cell>
                     <mat-cell *matCellDef="let element"> {{element.nombre}} </mat-cell>
                 </ng-container>
+                <ng-container matColumnDef="receptor">
+                    <mat-header-cell *matHeaderCellDef> Receptor </mat-header-cell>
+                    <mat-cell *matCellDef="let element"> {{element.receptor}} <br> {{element.rut_receptor}}</mat-cell>
+                </ng-container>
                 <ng-container matColumnDef="notas">
                     <mat-header-cell *matHeaderCellDef> Comentarios </mat-header-cell>
                     <mat-cell *matCellDef="let element"> {{element.comentario}} </mat-cell>
@@ -534,7 +538,7 @@
                         <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Buscar para Actualizar</button>
                     </div>
                     <div class="col-2" style="max-height: 50px; height: 50px;margin-left:20px; top:-9px; right:45px;" *ngIf=" filasMasivos>0 && selection.selected.length ">
-                        <a *ngIf=" login.usuario.admin " (click)="cambiodeEstadoMasivo()" data-toggle="modal" data-target="#EditEstadosMasivos" class="has-arrow waves-effect text-dark" style="margin-top:10px;">
+                        <a *ngIf=" login.usuario.admin " (click)="verCambiosMasivos()" class="has-arrow waves-effect text-dark" style="margin-top:10px;">
                             <b><i class="mdi mdi-checkbox-marked-circle-outline mdi-48px "></i></b>
                         </a>
                     </div>
@@ -909,110 +913,6 @@
                 <div class="custom-control text-right">
                     <button type="button" class="btn btn-secondary text-right" data-dismiss="modal" style="margin-right: 10px;">Abandonar</button>
                     <button type="button" class="btn btn-primary text-right" data-dismiss="modal" (click)="updateEstados()">Actualizar Estado</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Modal buscar usuarios -->
-<div class="modal fade" id="buscarUsuario" tabindex="-1" role="dialog" aria-labelledby="#buscarUsuario" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-striped" style="max-width: 950px;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Usuarios del sistema</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <table class="table table-sm">
-                    <thead class="bg-dark text-light">
-                        <tr translate="no">
-                            <th scope="col" style="width:100px;">id</th>
-                            <th scope="col" style="width:250px;">Nombre</th>
-                            <th scope="col" style="width:250px;">e-Mail</th>
-                            <th scope="col" style="width:100px;">Teléfono</th>
-                        </tr>
-                    </thead>
-                    <tbody translate="no" class="text-dark fuente75">
-                        <tr *ngFor="let item of login.usuarios" data-dismiss="modal" (click)="esteUsuario( item )">
-                            <td style="padding-top: 18px;" scope="row">
-                                <p>{{item.id}}</p>
-                            </td>
-                            <td style="padding-top: 18px;" scope="row">
-                                <p>{{ item.nombre }}</p>
-                            </td>
-                            <td style="padding-top: 18px;" scope="row">
-                                <p>{{ item.email }}</p>
-                            </td>
-                            <td style="padding-top: 18px;" scope="row">
-                                <p>{{ item.telefono }}</p>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Modal cambio de estados masivos de la encomienda -->
-<div class="modal fade" id="EditEstadosMasivos" tabindex="-1" role="dialog" aria-labelledby="EditEstadosMasivosLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
-        <div class="modal-content" style="width:670px;">
-            <div class="modal-header">
-                <h4 class="modal-title" id="ModalCenteredCrearLabel">Estados de las Encomiendas <b>MASIVO</b></h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body modal-body-scroll">
-                <table class="table table-sm table-striped table-condensed" cellpadding="0" cellspacing="0">
-                    <thead class="bg-dark text-light">
-                        <tr translate="no">
-                            <th scope="col" style="width:40px;"> </th>
-                            <th scope="col" style="width:90px;">Estado</th>
-                            <th scope="col" style="width:240px;">Descripción</th>
-                            <th scope="col" style="width:270px;">Usuario asignado</th>
-                            <th scope="col" style="width:40px;"> </th>
-                        </tr>
-                    </thead>
-                    <tbody translate="no" class="text-dark fuente75">
-                        <tr *ngFor="let item of estados">
-                            <td>
-                                <a (click)="cambiandoEstado(item)" class="has-arrow waves-effect text-dark" style="margin-top:10px;">
-                                    <i *ngIf="  item.marcada " class="mdi mdi-check mdi-24px"></i>
-                                    <i *ngIf=" !item.marcada " class="mdi mdi-checkbox-blank-circle-outline mdi-24px"></i>
-                                </a>
-                            </td>
-                            <td scope="row" class="sinBorde">
-                                <p>{{item.estado}}</p>
-                            </td>
-                            <td scope="row" class="sinBorde">
-                                <p>{{ item.descripcion }}</p>
-                            </td>
-                            <td scope="row" class="sinBorde">
-                                <p>{{ item.nombre }}</p>
-                            </td>
-                            <td scope="row" class="sinBorde">
-                                <a *ngIf=" item.marcada " (click)="cambiarUsuario( item )" data-toggle="modal" data-target="#buscarUsuario" class="has-arrow waves-effect text-dark">
-                                    <i class="mdi mdi-account-search mdi-24px"></i>
-                                </a>&nbsp;
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="modal-footer">
-                <div class="custom-control custom-checkbox text-left">
-                    <input type="checkbox" class="custom-control-input" id="customCheck1" name="cerrarPQT" [(ngModel)]="cerrarPQT">
-                    <label class="custom-control-label" for="customCheck1" style="left:-70px;"><b>Cerrar Encomiendas Marcadas</b></label>
-                </div>
-                <div class="custom-control text-right">
-                    <button type="button" class="btn btn-secondary text-right" data-dismiss="modal" style="margin-right: 10px;">Abandonar</button>
-                    <button type="button" class="btn btn-primary text-right" data-dismiss="modal" (click)="updateEstadosMasivos()">Actualizar Estado</button>
                 </div>
             </div>
         </div>

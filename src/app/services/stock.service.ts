@@ -21,8 +21,8 @@ export class StockService {
   }
 
   servicioWEB( cSP: string, parametros?: any ) {
-    console.log(cSP);
-    console.log(parametros);
+    // console.log(cSP);
+    // console.log(parametros);
     const url  = this.url + cSP;
     const body = parametros;
     return this.http.post( url, body );
@@ -58,6 +58,13 @@ export class StockService {
     formData.append('id_pqt',    idPaquete );
     //
     return this.http.post(url, formData);
+  }
+
+  imprimirOrden( data ) {
+    const url  = this.url + '/imprimirOrden';
+    const body = data;
+    return this.http.post( url, body );
+
   }
 
 }

@@ -1,0 +1,51 @@
+<!-- Modal cambio de estados masivos de la encomienda -->
+<div class="modal-header">
+    <h4 class="modal-title" id="ModalCenteredCrearLabel">Estados de las Encomiendas <b>MASIVO</b></h4>
+    <button type="button" (click)="salir()" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div class="modal-body modal-body-scroll">
+    <table class="table table-sm table-striped table-condensed" cellpadding="0" cellspacing="0">
+        <thead class="bg-dark text-light">
+            <tr translate="no">
+                <th scope="col" style="width:40px;"> </th>
+                <th scope="col" style="width:90px;">Estado</th>
+                <th scope="col" style="width:240px;">Descripción</th>
+                <th scope="col" style="width:270px;">Usuario asignado</th>
+                <th scope="col" style="width:40px;"> </th>
+            </tr>
+        </thead>
+        <tbody translate="no" class="text-dark fuente75">
+            <tr *ngFor="let item of estados">
+                <td>
+                    <a (click)="cambiandoEstado(item)" class="has-arrow waves-effect text-dark" style="margin-top:10px;">
+                        <i *ngIf="  item.marcada " class="mdi mdi-check mdi-24px"></i>
+                        <i *ngIf=" !item.marcada " class="mdi mdi-checkbox-blank-circle-outline mdi-24px"></i>
+                    </a>
+                </td>
+                <td scope="row" class="sinBorde">
+                    <p>{{item.estado}}</p>
+                </td>
+                <td scope="row" class="sinBorde">
+                    <p>{{ item.descripcion }}</p>
+                </td>
+                <td scope="row" class="sinBorde">
+                    <p>{{ item.nombre }}</p>
+                </td>
+                <td scope="row" class="sinBorde">
+                    <a *ngIf=" item.marcada " (click)="buscarCambiarUsuario( item )" class="has-arrow waves-effect text-dark">
+                        <i class="mdi mdi-account-search mdi-24px"></i>
+                    </a>&nbsp;
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="modal-footer">
+    <mat-checkbox class="example-margin" name="cerrarPQT" [(ngModel)]="cerrarPQT"><b>Cerrar Encomiendas Marcadas</b></mat-checkbox>
+    <div class="custom-control text-right">
+        <button type="button" class="btn btn-secondary text-right" style="margin-right: 10px;">Abandonar</button>
+        <button type="button" class="btn btn-primary text-right" (click)="updateEstadosMasivos()">Actualizar Estado</button>
+    </div>
+</div>
