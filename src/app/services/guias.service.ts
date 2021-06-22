@@ -45,7 +45,7 @@ export class GuiasService {
     let anno = fecha.getFullYear().toString();
     let mes  = ( '0' + ( fecha.getMonth() + 1 ).toString() ); 
     let dia  = ( '0' + ( fecha.getDate() ).toString() );
-    console.log(anno,mes,dia);
+    // console.log(anno,mes,dia);
     // const fe = fecha.getFullYear().toString() +
     //            ( '0' + ( fecha.getMonth() + 1 ).toString() ).slice(-2)  +
     //            ( '0' + ( fecha.getDate() ).toString() ).slice(-2);

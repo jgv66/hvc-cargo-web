@@ -44,7 +44,7 @@ export class EncomiendaUserComponent implements OnInit {
         }
       });
     }
-    this.salir(); 
+    this.dialogMas.close({ estados: this.estados }); 
   }
 
 }

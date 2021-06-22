@@ -60,25 +60,8 @@ export class EncomiendaCmComponent implements OnInit {
     }
   }
 
-  cambiodeEstadoMasivo() {
-    // limpiar para asignar
-    this.login.estados.forEach( element => {
-        element.id_estado = 0;
-        element.marcada   = false;
-        element.anterior  = false;
-        element.nombre    = '';
-        element.fecha_entera = null;
-    });
-    //
-    this.cerrarPQT = false;
-    this.estados = this.login.estados;
-    this.estadosPqt = [];
-    this.buscandoRetiros = true;
-    //
-  }
-
   updateEstadosMasivos() {
-    this.dialogMas.close({ cerrarPQT: this.cerrarPQT })
+    this.dialogMas.close({ cerrarPQT: this.cerrarPQT, estados: this.estados })
   }
 
   buscarCambiarUsuario( item ) {
@@ -97,7 +80,6 @@ export class EncomiendaCmComponent implements OnInit {
     dialogMas.afterClosed()
       .subscribe( data => {
         if ( data ) {
-          // this.grabarUsuarioEmpresa( data );
           console.log('dialogMas.afterClosed()->',data);
         }
       });  

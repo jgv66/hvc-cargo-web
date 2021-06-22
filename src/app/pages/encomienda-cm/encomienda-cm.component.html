@@ -45,7 +45,7 @@
 <div class="modal-footer">
     <mat-checkbox class="example-margin" name="cerrarPQT" [(ngModel)]="cerrarPQT"><b>Cerrar Encomiendas Marcadas</b></mat-checkbox>
     <div class="custom-control text-right">
-        <button type="button" class="btn btn-secondary text-right" style="margin-right: 10px;">Abandonar</button>
+        <button type="button" class="btn btn-secondary text-right" (click)="salir()" style="margin-right: 10px;">Abandonar</button>
         <button type="button" class="btn btn-primary text-right" (click)="updateEstadosMasivos()">Actualizar Estado</button>
     </div>
 </div>

@@ -729,24 +729,6 @@ export class EncomiendasComponent implements OnInit {
     return `${this.selection.isSelected(row) ? 'deselect' : 'select'} row ${row.position + 1}`;
   }
 
-  updateEstadosMasivos() {
-    const texto = 'Esta acción actualizará los estados de todas las encomiendas marcadas' + (this.cerrarPQT) ? '. Y cerrará los registros. Está de acuerdo?' : '.';
-    Swal.fire({
-      title: 'Grabaremos...',
-      text: texto,
-      icon: 'warning',
-      showCancelButton: true,
-      cancelButtonText: 'No, abandonar...',
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Sí, actualizar!'
-    }).then((result) => {
-      if (result.value) {
-        this.grabarEstadosMasivos();
-      }
-    });
-  }
-
   cambiarUsuario( item ) {
     this.estaPosicion = item.estado;
   }
@@ -774,6 +756,8 @@ export class EncomiendasComponent implements OnInit {
 
   verCambiosMasivos() {
     //
+    const selected = [ ...this.selection.selected ];
+    // 
     const dialogConfig = new MatDialogConfig();
     dialogConfig.disableClose = false;
     dialogConfig.autoFocus = false;
@@ -783,24 +767,40 @@ export class EncomiendasComponent implements OnInit {
     //
     const dialogRef = this.dialog.open( EncomiendaCmComponent, dialogConfig );
     //
-    dialogRef.afterClosed().subscribe(
-        data => console.log("Dialog output:", data)
-    );  
+    dialogRef.afterClosed()
+      .subscribe( data => { 
+        const texto = 'Esta acción actualizará los estados de todas las encomiendas marcadas' + (this.cerrarPQT) ? '. Y cerrará los registros. Está de acuerdo?' : '.';
+        Swal.fire({
+          title: 'Grabaremos...',
+          text: texto,
+          icon: 'warning',
+          showCancelButton: true,
+          cancelButtonText: 'Cancelar',
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Sí, actualizar!'
+        }).then((result) => {
+          if (result.value) {
+            this.grabarEstadosMasivos( data, selected );
+          }
+        });
+      });  
     //
   }
 
-  grabarEstadosMasivos() {
+  grabarEstadosMasivos( data, selected ) {
     this.buscandoMasivo = true;
     this.marcaRojo = true;
     // origen
     let carga = {};
-    const marcados = this.estados.filter( item => item.marcada === true );
+    const marcados = data.estados.filter( item => item.marcada === true );
     //
-    for (const s of this.selection.selected ) {
+    for (const s of selected ) {
       //
       carga = { id_paquete: s.id_paquete,
                 cierre:     this.cerrarPQT,
                 estados:    marcados };
+      console.log(carga);
       //
       this.stockSS.servicioWEB('/grabarEstados', carga)
         .subscribe((data: any) => {

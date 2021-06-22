@@ -537,10 +537,11 @@
                     <div class="col-2" style="max-height: 50px; height: 50px;">
                         <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Buscar para Actualizar</button>
                     </div>
-                    <div class="col-2" style="max-height: 50px; height: 50px;margin-left:20px; top:-9px; right:45px;" *ngIf=" filasMasivos>0 && selection.selected.length ">
-                        <a *ngIf=" login.usuario.admin " (click)="verCambiosMasivos()" class="has-arrow waves-effect text-dark" style="margin-top:10px;">
-                            <b><i class="mdi mdi-checkbox-marked-circle-outline mdi-48px "></i></b>
-                        </a>
+                    <div class="col-2">
+                        <button type="button" class="btn btn-primary" (click)="verCambiosMasivos()" style="max-height: 50px; height: 50px;" *ngIf=" login.usuario.admin && filasMasivos>0 && selection.selected.length ">
+                            <i class="mdi mdi-checkbox-marked-circle-outline mdi-18px "></i>
+                            Ir a cambios
+                        </button>
                     </div>
                 </div>
             </form>
