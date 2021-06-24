@@ -60,10 +60,6 @@
                             </div>
                         </div>
                         <div class="row" style="margin-top: 10px;">
-                            <div class="col-md-2">
-                                <label>Tipo de Carga</label>
-                                <input clearInput="true" type="text" class="form-control" name="carga.obs_carga" [(ngModel)]="carga.obs_carga">
-                            </div>
                             <div class="col-md-1">
                                 <label>Bultos</label>
                                 <input clearInput="true" type="number" class="form-control" name="carga.bultos" [(ngModel)]="carga.bultos">
@@ -77,6 +73,19 @@
                                 <input clearInput="true" type="number" class="form-control" name="carga.volumen" [(ngModel)]="carga.volumen">
                             </div>
                             <div class="col-md-2">
+                                <label>
+                                    Valor Encomienda
+                                    <a  (click)="calcularValor()" class="has-arrow waves-effect text-dark" style="margin-left:10px;">
+                                        <i class="mdi mdi-help-circle-outline mdi-18px" style="color: red"></i>
+                                    </a>
+                                </label>
+                                <input clearInput="true" type="number" class="form-control" name="carga.valor_cobrado" [(ngModel)]="carga.valor_cobrado">
+                            </div>
+                            <div class="col-md-2">
+                                <label>Tipo de Carga</label>
+                                <input clearInput="true" type="text" class="form-control" name="carga.obs_carga" [(ngModel)]="carga.obs_carga">
+                            </div>
+                            <div class="col-md-2">
                                 <label>Tipo y Nro.de Documento</label>
                                 <input clearInput="true" type="text" class="form-control" name="carga.numero_legal" [(ngModel)]="carga.numero_legal">
                             </div>
@@ -86,15 +95,6 @@
                                     <option value=""></option>
                                     <option *ngFor="let tp of login.tiposDePago" [value]="tp.tipo_pago">{{ tp.descripcion }}</option>
                                 </select>
-                            </div>
-                            <div class="col-md-2">
-                                <label>
-                                    Valor Encomienda
-                                    <a  (click)="calcularValor()" class="has-arrow waves-effect text-dark" style="margin-left:10px;">
-                                        <i class="mdi mdi-help-circle-outline mdi-18px" style="color: red"></i>
-                                    </a>
-                                </label>
-                                <input clearInput="true" type="number" class="form-control" name="carga.valor_cobrado" [(ngModel)]="carga.valor_cobrado">
                             </div>
                         </div>
                     </div>

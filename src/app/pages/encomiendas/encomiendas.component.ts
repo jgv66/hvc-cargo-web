@@ -828,7 +828,7 @@ export class EncomiendasComponent implements OnInit {
     dialogConfig.disableClose = false;
     dialogConfig.autoFocus = false;
     dialogConfig.width = '700px';
-    dialogConfig.height = '660px';
+    dialogConfig.height = '560px';
     dialogConfig.data = {};
     //
     const dialogRef = this.dialog.open( CalcularvalorComponent, dialogConfig );
@@ -837,6 +837,12 @@ export class EncomiendasComponent implements OnInit {
       .subscribe( data => { 
         if ( data ) {
           console.log('dialogRef.afterClosed()->',data);
+          // actualizar el array
+          this.carga.valor_cobrado = data.precio;
+          this.carga.bultos        = data.cantidad;
+          this.carga.peso          = data.peso;
+          this.carga.volumen       = data.volumen;
+          //
         }
       });  
       //
