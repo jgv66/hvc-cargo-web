@@ -1,0 +1,63 @@
+<!-- Modal cambio de estados masivos de la encomienda -->
+<div class="modal-header">
+    <h4 class="modal-title">Calcular el valor de la encomienda</h4>
+    <button type="button" (click)="salir()" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<div>
+
+    <div class="card" style="width: 100%;margin-top:10px;font-size:90%;">
+        <div class="card-body">
+
+            <div class="row">
+                <mat-form-field class="example-form-field col-4">
+                    <mat-label>Cantidad de bultos</mat-label>
+                    <input matInput type="number" name="cantidad" [(ngModel)]="cantidad">
+                    <button *ngIf="cantidad" matSuffix mat-icon-button aria-label="Clear" (click)="cantidad=''">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </mat-form-field>
+            </div>
+            <div class="row">
+                <mat-form-field class="example-form-field col-4">
+                    <mat-label>Alto (cms)</mat-label>
+                    <input matInput type="number" name="alto" [(ngModel)]="alto">
+                    <button *ngIf="alto" matSuffix mat-icon-button aria-label="Clear" (click)="alto=''">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </mat-form-field>
+                <mat-form-field class="example-form-field col-4">
+                    <mat-label>Ancho (cms)</mat-label>
+                    <input matInput type="number" name="ancho" [(ngModel)]="ancho">
+                    <button *ngIf="ancho" matSuffix mat-icon-button aria-label="Clear" (click)="ancho=''">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </mat-form-field>
+                <mat-form-field class="example-form-field col-4">
+                    <mat-label>Largo (cms)</mat-label>
+                    <input matInput type="number" name="largo" [(ngModel)]="largo">
+                    <button *ngIf="largo" matSuffix mat-icon-button aria-label="Clear" (click)="largo=''">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </mat-form-field>
+            </div>
+            <div class="row">
+                <mat-form-field class="example-form-field col-6">
+                    <mat-label>Peso (Kg)</mat-label>
+                    <input matInput type="number" name="peso" [(ngModel)]="peso">
+                    <button *ngIf="peso" matSuffix mat-icon-button aria-label="Clear" (click)="peso=''">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </mat-form-field>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <div class="custom-control text-right">
+            <button type="button" class="btn btn-secondary text-right" (click)="salir()" style="margin-right: 10px;">Salir</button>
+            <button type="button" class="btn btn-primary text-right" (click)="updateValor()">Actualizar valores</button>
+        </div>
+    </div>
+</div>

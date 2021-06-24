@@ -88,7 +88,12 @@
                                 </select>
                             </div>
                             <div class="col-md-2">
-                                <label>Valor Encomienda</label>
+                                <label>
+                                    Valor Encomienda
+                                    <a  (click)="calcularValor()" class="has-arrow waves-effect text-dark" style="margin-left:10px;">
+                                        <i class="mdi mdi-help-circle-outline mdi-18px" style="color: red"></i>
+                                    </a>
+                                </label>
                                 <input clearInput="true" type="number" class="form-control" name="carga.valor_cobrado" [(ngModel)]="carga.valor_cobrado">
                             </div>
                         </div>
@@ -535,12 +540,13 @@
                         </mat-form-field>
                     </div>
                     <div class="col-2" style="max-height: 50px; height: 50px;">
-                        <button type="submit" class="btn btn-primary" style="margin-top: 10px;">Buscar para Actualizar</button>
+                        <button type="submit" class="btn btn-primary" style="margin-top: 10px;">
+                            Buscar para Actualizar
+                        </button>
                     </div>
-                    <div class="col-2">
-                        <button type="button" class="btn btn-primary" (click)="verCambiosMasivos()" style="max-height: 50px; height: 50px;" *ngIf=" login.usuario.admin && filasMasivos>0 && selection.selected.length ">
-                            <i class="mdi mdi-checkbox-marked-circle-outline mdi-18px "></i>
-                            Ir a cambios
+                    <div class="col-2" style="max-height: 50px; height: 50px;">
+                        <button type="button" class="btn btn-primary" (click)="verCambiosMasivos()" style="margin-top: 10px;" *ngIf=" login.usuario.admin && filasMasivos>0 && selection.selected.length ">
+                            Ir a los cambios
                         </button>
                     </div>
                 </div>

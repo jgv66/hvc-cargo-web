@@ -17,6 +17,7 @@ import { StockService } from '../../services/stock.service';
 import { LoginService } from '../../services/login.service';
 import { GuiasService } from '../../services/guias.service';
 import { EncomiendaCmComponent } from '../encomienda-cm/encomienda-cm.component';
+import { CalcularvalorComponent } from '../calcularvalor/calcularvalor.component';
 
 @Component({
   selector: 'app-encomiendas',
@@ -769,23 +770,25 @@ export class EncomiendasComponent implements OnInit {
     //
     dialogRef.afterClosed()
       .subscribe( data => { 
-        const texto = 'Esta acción actualizará los estados de todas las encomiendas marcadas' + (this.cerrarPQT) ? '. Y cerrará los registros. Está de acuerdo?' : '.';
-        Swal.fire({
-          title: 'Grabaremos...',
-          text: texto,
-          icon: 'warning',
-          showCancelButton: true,
-          cancelButtonText: 'Cancelar',
-          confirmButtonColor: '#3085d6',
-          cancelButtonColor: '#d33',
-          confirmButtonText: 'Sí, actualizar!'
-        }).then((result) => {
-          if (result.value) {
-            this.grabarEstadosMasivos( data, selected );
-          }
-        });
+        if ( data ) {
+          const texto = 'Esta acción actualizará los estados de todas las encomiendas marcadas' + (this.cerrarPQT) ? '. Y cerrará los registros. Está de acuerdo?' : '.';
+          Swal.fire({
+            title: 'Grabaremos...',
+            text: texto,
+            icon: 'warning',
+            showCancelButton: true,
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, actualizar!'
+          }).then((result) => {
+            if (result.value) {
+              this.grabarEstadosMasivos( data, selected );
+            }
+          });
+        }
       });  
-    //
+      //
   }
 
   grabarEstadosMasivos( data, selected ) {
@@ -818,7 +821,27 @@ export class EncomiendasComponent implements OnInit {
     this.marcaRojo = false;
     //
   }
-    
+
+  calcularValor() {
+    //
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.disableClose = false;
+    dialogConfig.autoFocus = false;
+    dialogConfig.width = '700px';
+    dialogConfig.height = '660px';
+    dialogConfig.data = {};
+    //
+    const dialogRef = this.dialog.open( CalcularvalorComponent, dialogConfig );
+    //
+    dialogRef.afterClosed()
+      .subscribe( data => { 
+        if ( data ) {
+          console.log('dialogRef.afterClosed()->',data);
+        }
+      });  
+      //
+  }
+
   etq1() {
     return `
     ^XA

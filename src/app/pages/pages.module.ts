@@ -22,6 +22,7 @@ import { InfpickComponent } from './infpick/infpick.component';
 import { ComponentsModule } from '../components/components.module';
 import { EncomiendaCmComponent } from './encomienda-cm/encomienda-cm.component';
 import { EncomiendaUserComponent } from './encomienda-user/encomienda-user.component';
+import { CalcularvalorComponent } from './calcularvalor/calcularvalor.component';
 
 @NgModule({
     declarations: [
@@ -35,6 +36,7 @@ import { EncomiendaUserComponent } from './encomienda-user/encomienda-user.compo
         InfpickComponent,
         EncomiendaCmComponent,
         EncomiendaUserComponent,
+        CalcularvalorComponent,
     ],
     exports: [
         DashboardComponent,
