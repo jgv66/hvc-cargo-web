@@ -38,6 +38,9 @@ import { CalcularvalorComponent } from './calcularvalor/calcularvalor.component'
         EncomiendaUserComponent,
         CalcularvalorComponent,
     ],
+    entryComponents: [EncomiendaCmComponent,
+                      EncomiendaUserComponent,
+                      CalcularvalorComponent,],
     exports: [
         DashboardComponent,
         EditalineaComponent
