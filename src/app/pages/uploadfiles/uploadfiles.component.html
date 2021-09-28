@@ -1,0 +1,26 @@
+<div class="modal-header">
+    <h4 class="modal-title">Adjuntar archivos a la Encomienda #{{ data.data.id_paquete }}</h4>
+    <button type="button" (click)="salir()" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+
+<div class="content">
+
+    <!-- esta funcionó -->
+    <div class="container">
+        <form [formGroup]="form" (ngSubmit)="submitUser()">
+            <div class="progress form-group" *ngIf="progress > 0">
+                <div class="progress-bar progress-bar-striped bg-success" role="progressbar" [style.width.%]="progress">
+                </div>
+            </div>
+            <div class="form-group">
+                <input class="archivo" type="file" (change)="uploadFile($event)">
+            </div>
+            <div class="form-group">
+                <button class="btn btn-danger btn-block btn-md">Subir archivo adjunto: {{ archivo?.name }}</button>
+            </div>
+        </form>
+    </div>
+
+</div>

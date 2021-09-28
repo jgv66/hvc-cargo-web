@@ -8,7 +8,7 @@ import { MattableencomiendasComponent } from './mattableencomiendas/mattableenco
 
 @NgModule({
   exports: [MattableencomiendasComponent],
-  declarations: [MattableencomiendasComponent],
+  declarations: [MattableencomiendasComponent, ],
   imports: [ CommonModule, MaterialModule ]
 })
 export class ComponentsModule { }

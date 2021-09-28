@@ -10,7 +10,6 @@ import { PagesModule } from './pages/pages.module';
 // temporal
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-
 // material
 import { MaterialModule } from './material.module';
 

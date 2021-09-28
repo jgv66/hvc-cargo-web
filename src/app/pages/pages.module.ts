@@ -23,6 +23,7 @@ import { ComponentsModule } from '../components/components.module';
 import { EncomiendaCmComponent } from './encomienda-cm/encomienda-cm.component';
 import { EncomiendaUserComponent } from './encomienda-user/encomienda-user.component';
 import { CalcularvalorComponent } from './calcularvalor/calcularvalor.component';
+import { UploadfilesComponent } from './uploadfiles/uploadfiles.component';
 
 @NgModule({
     declarations: [
@@ -37,6 +38,7 @@ import { CalcularvalorComponent } from './calcularvalor/calcularvalor.component'
         EncomiendaCmComponent,
         EncomiendaUserComponent,
         CalcularvalorComponent,
+        UploadfilesComponent,
     ],
     entryComponents: [EncomiendaCmComponent,
                       EncomiendaUserComponent,

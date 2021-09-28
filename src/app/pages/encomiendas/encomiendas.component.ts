@@ -18,6 +18,7 @@ import { LoginService } from '../../services/login.service';
 import { GuiasService } from '../../services/guias.service';
 import { EncomiendaCmComponent } from '../encomienda-cm/encomienda-cm.component';
 import { CalcularvalorComponent } from '../calcularvalor/calcularvalor.component';
+import { UploadfilesComponent } from '../uploadfiles/uploadfiles.component';
 
 @Component({
   selector: 'app-encomiendas',
@@ -128,8 +129,8 @@ export class EncomiendasComponent implements OnInit {
               const rows = [];
               dev.datos.forEach(element => rows.push(element, { detailRow: false, element }));
               this.dsRetiros = new MatTableDataSource(rows);
-              this.dsRetiros.paginator = this.paginator.toArray()[0];
-              this.dsRetiros.sort = this.sort.toArray()[0];
+              // this.dsRetiros.paginator = this.paginator.toArray()[0];
+              // this.dsRetiros.sort = this.sort.toArray()[0];
               // console.log(this.dsRetiros);
             }
         },
@@ -141,9 +142,9 @@ export class EncomiendasComponent implements OnInit {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dsRetiros.filter = filterValue.trim().toLowerCase();
     //
-    if (this.dsRetiros.paginator) {
-      this.dsRetiros.paginator.firstPage();
-    }
+    // if (this.dsRetiros.paginator) {
+    //   this.dsRetiros.paginator.firstPage();
+    // }
     //
   }
   // function
@@ -320,6 +321,7 @@ export class EncomiendasComponent implements OnInit {
     this.idfoto = undefined;
     this.cargando = true;
     const IMG_URL = this.stockSS.url + '/public/img/' ;
+    const ATT_URL = this.stockSS.url + '/public/attach/' ;
     //
     this.stockSS.servicioWEB( '/getimages', { id_pqt: item.id_paquete } )
         .subscribe( (dev: any) => {
@@ -328,7 +330,11 @@ export class EncomiendasComponent implements OnInit {
           if ( dev.resultado === 'ok' ) {
             this.idfoto = item.id_paquete;
             dev.datos.forEach( element => {
-              element.imgb64 = IMG_URL + element.imgb64;
+              if ( element.attach === true ) {
+                element.imgb64 = ATT_URL + element.attach_name;
+              } else {
+                element.imgb64 = IMG_URL + element.imgb64;
+              }
             })
             this.lasFotos = dev.datos;
           }
@@ -846,6 +852,19 @@ export class EncomiendasComponent implements OnInit {
         }
       });  
       //
+  }
+
+  subirArchivos( item ) {
+    //
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.disableClose = false;
+    dialogConfig.autoFocus = false;
+    dialogConfig.width = '700px';
+    dialogConfig.height = '260px';
+    dialogConfig.data = { data: item };
+    //
+    const dialogRef = this.dialog.open( UploadfilesComponent, dialogConfig );
+    //
   }
 
   etq1() {

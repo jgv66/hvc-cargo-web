@@ -8,6 +8,7 @@
         <a class="nav-item nav-link" id="nav-masivos-tab" data-toggle="tab" href="#nav-masivos" role="tab" aria-controls="nav-masivos" aria-selected="false"><b>Cambios Masivos</b></a>
     </div>
 </nav>
+
 <div class="tab-content" id="nav-tabContent">
     <!-- Nueva Encomienda -->
     <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">
@@ -145,111 +146,118 @@
     </div>
     <!-- pendientes de transportar -->
     <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
-        <mat-progress-bar *ngIf=" buscandoRetiros " style="width: 100%;height: 5px;" color="primary" mode="indeterminate"></mat-progress-bar>
-        <div class="form-row mt-2 mb-2">
-            <div class="col-3" *ngIf=" filasRetiro > 0 " style="margin-top:10px">
-                <mat-form-field appearance="" style="margin-left: 15px;">
-                    <mat-label>Filtrar</mat-label>
-                    <input matInput (keyup)="aplicarFiltroRetiro( $event )" name="filtroRetiro" [(ngModel)]="filtro" placeholder="digite algo..." #input>
-                    <button mat-button *ngIf=" filtro !== '' " matSuffix mat-icon-button aria-label="Clear" (click)=" filtro = '' ">
-                        <mat-icon>close</mat-icon>
+        <div classs="card" style="margin-top: 5px;">
+            <mat-progress-bar *ngIf=" buscandoRetiros " style="width: 100%;height: 5px;" color="primary" mode="indeterminate"></mat-progress-bar>
+            <div class="form-row mt-2 mb-2">
+                <div class="col-3" *ngIf=" filasRetiro > 0 " style="margin-top:10px">
+                    <mat-form-field appearance="" style="margin-left: 15px;">
+                        <mat-label>Filtrar</mat-label>
+                        <input matInput (keyup)="aplicarFiltroRetiro( $event )" name="filtroRetiro" [(ngModel)]="filtro" placeholder="digite algo..." #input>
+                        <button mat-button *ngIf=" filtro !== '' " matSuffix mat-icon-button aria-label="Clear" (click)=" filtro = '' ">
+                            <mat-icon>close</mat-icon>
+                        </button>
+                    </mat-form-field>
+                </div>
+                <div class="col-2" style="max-height: 50px; height: 50px;margin-left:10px;margin-top:20px;">
+                    <button type="button" class="btn btn-block btn-primary" (click)="cargarDatosPendientes()">
+                        <i class="mdi mdi-refresh mdi-12px"></i>Refrescar
                     </button>
-                </mat-form-field>
+                </div>
             </div>
-            <div class="col-2" style="max-height: 50px; height: 50px;margin-left:10px;margin-top:20px;">
-                <button type="button" class="btn btn-block btn-primary" (click)="cargarDatosPendientes()">
-                    <i class="mdi mdi-refresh mdi-12px"></i>Refrescar
-                </button>
+            <div class="fix-container">
+                <mat-table [dataSource]="dsRetiros" style="margin-top: -10px;" class="mat-elevation-z8">
+                    <ng-container matColumnDef="id_paquete">
+                        <mat-header-cell *matHeaderCellDef style="max-width: 100px;width: 100px;"> #Id </mat-header-cell>
+                        <mat-cell *matCellDef="let element" style="max-width: 100px;width: 100px;"><b> {{element.id_paquete}} </b></mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="fecha_creacion">
+                        <mat-header-cell *matHeaderCellDef style="max-width: 120px;width: 120px;">Fecha Creación</mat-header-cell>
+                        <mat-cell *matCellDef="let element" style="max-width: 120px;width: 120px;"> {{element.fecha_creacion}} </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="obs_carga">
+                        <mat-header-cell *matHeaderCellDef style="max-width: 120px;width: 120px;"> Encomienda </mat-header-cell>
+                        <mat-cell *matCellDef="let element" style="max-width: 120px;width: 120px;"> {{element.obs_carga}} </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="cli_razon">
+                        <mat-header-cell *matHeaderCellDef style="max-width: 430px;width: 430px;"> Cliente </mat-header-cell>
+                        <mat-cell *matCellDef="let element" style="max-width: 430px;width: 430px;"> {{element.cli_razon}} </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="des_razon">
+                        <mat-header-cell *matHeaderCellDef style="max-width: 400px;width: 400px;"> Destinatario </mat-header-cell>
+                        <mat-cell *matCellDef="let element" style="max-width: 400px;width: 400px;"> {{element.des_razon}} </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="tipo_pago">
+                        <mat-header-cell *matHeaderCellDef style="max-width: 180px;width: 180px;"> Cobro </mat-header-cell>
+                        <mat-cell *matCellDef="let element" style="max-width: 180px;width: 180px;font-weight: bold; color: red"> {{element.tipo_pago}} </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="estado">
+                        <mat-header-cell *matHeaderCellDef style="max-width: 200px;width: 200px;"> Estado </mat-header-cell>
+                        <mat-cell *matCellDef="let element" style="max-width: 200px;width: 200px;"> {{element.estado}} </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="acciones">
+                        <mat-header-cell *matHeaderCellDef> Acciones </mat-header-cell>
+                        <mat-cell *matCellDef="let item">
+                            <a *ngIf=" login.usuario.admin " (click)="revisarEncomienda( item )" data-toggle="modal" data-target="#EditEncomienda" class="has-arrow waves-effect text-dark" style="margin-top:10px;">
+                                <i class="mdi mdi-lead-pencil mdi-24px"></i>
+                            </a>&nbsp;&nbsp;
+                            <a *ngIf=" login.usuario.admin " (click)="cargarFoto( item )" data-toggle="modal" data-target="#ImagenModal" class="has-arrow waves-effect text-dark" style="margin-top:10px;color:red;">
+                                <i class="mdi mdi-camera mdi-24px "></i>
+                            </a>&nbsp;&nbsp;
+                            <a *ngIf=" login.usuario.admin " (click)="subirArchivos( item )" style="margin-top:10px;">
+                                <i class="mdi mdi-cloud-upload mdi-24px "></i>
+                            </a>&nbsp;&nbsp;
+                            <a *ngIf=" login.usuario.admin " (click)="cambiodeEstado( item )" data-toggle="modal" data-target="#EditEstados" class="has-arrow waves-effect text-dark" style="margin-top:10px;">
+                                <i class="mdi mdi-checkbox-marked-circle-outline mdi-24px "></i>
+                            </a>&nbsp;&nbsp;
+                            <a *ngIf=" login.usuario.admin " (click)="borrarEncomienda( item )" class="has-arrow waves-effect text-dark" style="margin-top:10px;color:red;">
+                                <i class="mdi mdi-delete mdi-24px "></i>
+                            </a>
+                        </mat-cell>
+                    </ng-container>
+                    <ng-container matColumnDef="detalleRetiros">
+                        <mat-cell *matCellDef="let detail" [attr.colspan]="dispColumns.length">
+                            <table class="table table-striped table-hover table-sm">
+                                <tbody translate="no">
+                                    <tr>
+                                        <td scope="row" style="width: 69px;"></td>
+                                        <td scope="row" style="width: 150px;">
+                                            <p><i class="mdi mdi-clock-fast mdi-18px"></i> {{ detail.element.hora_creacion }}</p>
+                                            <p><i class="mdi mdi-calendar-question mdi-18px"></i> {{ detail.element.fecha_prometida }}</p>
+                                        </td>
+                                        <td scope="row" style="width: 150px;">
+                                            <p><i class="mdi mdi-package-variant-closed mdi-18px"></i> {{ detail.element.bultos }} </p>
+                                            <p><i class="mdi mdi-weight-kilogram mdi-18px"></i> {{ detail.element.peso | number:"1.0-2" }}Kg </p>
+                                        </td>
+                                        <td scope="row" style="width: 300px;">
+                                            <p>{{ detail.element.cli_direccion }}, {{ detail.element.cli_comuna}} </p>
+                                            <p>{{ detail.element.contacto }}</p>
+                                            <p>{{ detail.element.cli_referencias }}</p>
+                                        </td>
+                                        <td scope="row" style="width: 310px;">
+                                            <p style="margin-left: 5px;">{{ detail.element.des_direccion }}, {{ detail.element.des_comuna}} </p>
+                                        </td>
+                                        <td style="max-width: 180px;width: 180px;padding-top: 18px; font-weight: bold; color: red" scope="row">
+                                            <p>${{ detail.element.valor_cobrado | number:"1.0-0"}}</p>
+                                        </td>
+                                        <td scope="row" style="max-width: 180px;width: 180px;">
+                                            <p><i class="mdi mdi-calendar-clock mdi-18px"></i> {{ detail.element.asignacion }}</p>
+                                            <p><i class="mdi mdi-clock-fast mdi-18px"></i> {{ detail.element.hora_asignacion }}</p>
+                                            <p><i class="mdi mdi-account-settings mdi-18px"></i> {{ detail.element.pickeador }}</p>
+                                        </td>
+                                        <td class="text-center">
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </mat-cell>
+                    </ng-container>
+                    <mat-header-row *matHeaderRowDef="dispColumns; sticky: true"></mat-header-row>
+                    <mat-row *matRowDef="let row; columns: dispColumns;" class="element-row" [class.expanded]="expandedElementR == row" (click)="expandedElementR = row"></mat-row>
+                    <mat-row *matRowDef="let row; columns: ['detalleRetiros']; when: isExpansionDetailRowR" [@detailExpand]="row.element == expandedElementR ? 'expanded' : 'collapsed'" style="overflow: hidden"></mat-row>
+                </mat-table>
             </div>
         </div>
-        <mat-table matSort [dataSource]="dsRetiros" style="margin-top: -10px;" class="mat-elevation-z8">
-            <ng-container matColumnDef="id_paquete">
-                <mat-header-cell *matHeaderCellDef style="max-width: 100px;width: 100px;" mat-sort-header> #Id </mat-header-cell>
-                <mat-cell *matCellDef="let element" style="max-width: 100px;width: 100px;"><b> #{{element.id_paquete}} </b></mat-cell>
-            </ng-container>
-            <ng-container matColumnDef="fecha_creacion">
-                <mat-header-cell *matHeaderCellDef style="max-width: 150px;width: 150px;" mat-sort-header>Fecha Creación</mat-header-cell>
-                <mat-cell *matCellDef="let element" style="max-width: 150px;width: 150px;"> {{element.fecha_creacion}} </mat-cell>
-            </ng-container>
-            <ng-container matColumnDef="obs_carga">
-                <mat-header-cell *matHeaderCellDef style="max-width: 150px;width: 150px;"> Encomienda </mat-header-cell>
-                <mat-cell *matCellDef="let element" style="max-width: 150px;width: 150px;"> {{element.obs_carga}} </mat-cell>
-            </ng-container>
-            <ng-container matColumnDef="cli_razon">
-                <mat-header-cell *matHeaderCellDef style="max-width: 430px;width: 430px;" mat-sort-header> Cliente </mat-header-cell>
-                <mat-cell *matCellDef="let element" style="max-width: 430px;width: 430px;"> {{element.cli_razon}} </mat-cell>
-            </ng-container>
-            <ng-container matColumnDef="des_razon">
-                <mat-header-cell *matHeaderCellDef style="max-width: 400px;width: 400px;" mat-sort-header> Destinatario </mat-header-cell>
-                <mat-cell *matCellDef="let element" style="max-width: 400px;width: 400px;"> {{element.des_razon}} </mat-cell>
-            </ng-container>
-            <ng-container matColumnDef="tipo_pago">
-                <mat-header-cell *matHeaderCellDef style="max-width: 180px;width: 180px;"> Cobro </mat-header-cell>
-                <mat-cell *matCellDef="let element" style="max-width: 180px;width: 180px;font-weight: bold; color: red"> {{element.tipo_pago}} </mat-cell>
-            </ng-container>
-            <ng-container matColumnDef="estado">
-                <mat-header-cell *matHeaderCellDef style="max-width: 200px;width: 200px;" mat-sort-header> Estado </mat-header-cell>
-                <mat-cell *matCellDef="let element" style="max-width: 200px;width: 200px;"> {{element.estado}} </mat-cell>
-            </ng-container>
-            <ng-container matColumnDef="acciones">
-                <mat-header-cell *matHeaderCellDef> Acciones </mat-header-cell>
-                <mat-cell *matCellDef="let item">
-                    <a *ngIf=" login.usuario.admin " (click)="revisarEncomienda( item )" data-toggle="modal" data-target="#EditEncomienda" class="has-arrow waves-effect text-dark" style="margin-top:10px;">
-                        <i class="mdi mdi-lead-pencil mdi-24px"></i>
-                    </a>&nbsp;
-                    <a *ngIf=" login.usuario.admin " (click)="cargarFoto( item )" data-toggle="modal" data-target="#ImagenModal" class="has-arrow waves-effect text-dark" style="margin-top:10px;color:red;">
-                        <i class="mdi mdi-camera mdi-24px "></i>
-                    </a>
-                    <a *ngIf=" login.usuario.admin " (click)="cambiodeEstado( item )" data-toggle="modal" data-target="#EditEstados" class="has-arrow waves-effect text-dark" style="margin-top:10px;">
-                        <i class="mdi mdi-checkbox-marked-circle-outline mdi-24px "></i>
-                    </a>&nbsp;
-                    <a *ngIf=" login.usuario.admin " (click)="borrarEncomienda( item )" class="has-arrow waves-effect text-dark" style="margin-top:10px;color:red;">
-                        <i class="mdi mdi-delete mdi-24px "></i>
-                    </a>
-                </mat-cell>
-            </ng-container>
-            <ng-container matColumnDef="detalleRetiros">
-                <mat-cell *matCellDef="let detail" [attr.colspan]="dispColumns.length">
-                    <table class="table table-striped table-hover table-sm">
-                        <tbody translate="no">
-                            <tr>
-                                <td scope="row" style="width: 69px;"></td>
-                                <td scope="row" style="width: 150px;">
-                                    <p><i class="mdi mdi-clock-fast mdi-18px"></i> {{ detail.element.hora_creacion }}</p>
-                                    <p><i class="mdi mdi-calendar-question mdi-18px"></i> {{ detail.element.fecha_prometida }}</p>
-                                </td>
-                                <td scope="row" style="width: 150px;">
-                                    <p><i class="mdi mdi-package-variant-closed mdi-18px"></i> {{ detail.element.bultos }} </p>
-                                    <p><i class="mdi mdi-weight-kilogram mdi-18px"></i> {{ detail.element.peso | number:"1.0-2" }}Kg </p>
-                                </td>
-                                <td scope="row" style="width: 300px;">
-                                    <p>{{ detail.element.cli_direccion }}, {{ detail.element.cli_comuna}} </p>
-                                    <p>{{ detail.element.contacto }}</p>
-                                    <p>{{ detail.element.cli_referencias }}</p>
-                                </td>
-                                <td scope="row" style="width: 310px;">
-                                    <p style="margin-left: 5px;">{{ detail.element.des_direccion }}, {{ detail.element.des_comuna}} </p>
-                                </td>
-                                <td style="max-width: 180px;width: 180px;padding-top: 18px; font-weight: bold; color: red" scope="row">
-                                    <p>${{ detail.element.valor_cobrado | number:"1.0-0"}}</p>
-                                </td>
-                                <td scope="row" style="max-width: 180px;width: 180px;">
-                                    <p><i class="mdi mdi-calendar-clock mdi-18px"></i> {{ detail.element.asignacion }}</p>
-                                    <p><i class="mdi mdi-clock-fast mdi-18px"></i> {{ detail.element.hora_asignacion }}</p>
-                                    <p><i class="mdi mdi-account-settings mdi-18px"></i> {{ detail.element.pickeador }}</p>
-                                </td>
-                                <td class="text-center">
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </mat-cell>
-            </ng-container>
-            <mat-header-row *matHeaderRowDef="dispColumns"></mat-header-row>
-            <mat-row *matRowDef="let row; columns: dispColumns;" class="element-row" [class.expanded]="expandedElementR == row" (click)="expandedElementR = row"></mat-row>
-            <mat-row *matRowDef="let row; columns: ['detalleRetiros']; when: isExpansionDetailRowR" [@detailExpand]="row.element == expandedElementR ? 'expanded' : 'collapsed'" style="overflow: hidden"></mat-row>
-        </mat-table>
-        <mat-paginator [hidePageSize]="true" [length]="filasRetiro" [pageSize]="16" [pageSizeOptions]="[16, 32, 64]" showFirstLastButtons></mat-paginator>
+        <!-- <mat-paginator [hidePageSize]="true" [length]="filasRetiro" [pageSize]="16" [pageSizeOptions]="[16, 32, 64]" showFirstLastButtons></mat-paginator> -->
     </div>
     <!-- clientes -->
     <div class="tab-pane fade" id="nav-cliente" role="tabpanel" aria-labelledby="nav-cliente-tab">
@@ -611,7 +619,8 @@
             </div>
             <div class="modal-body" *ngFor="let foto of lasFotos">
                 <p>Fecha {{ foto.fecha }} - Hora {{ foto.hora }}</p>
-                <img [src]="foto.imgb64" style="width: 100%;">
+                <img *ngIf=" foto.attach === false " [src]="foto.imgb64" style="width: 100%;">
+                <a *ngIf=" foto.attach === true  " [href]="foto.imgb64" target="_blank">Descargar {{ foto.attach_name }}</a>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>

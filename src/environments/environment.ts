@@ -4,7 +4,8 @@
 
 export const environment = {
   production: false,
-  API_URL: 'https://api.hvc.kinetik.cl'
+  API_URL: 'https://api.hvc.kinetik.cl',
+  URL_IMAGENES: 'https://imagenes.kinetik.cl/hvc'  
 };
 
 /*
