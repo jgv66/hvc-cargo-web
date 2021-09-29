@@ -141,11 +141,6 @@ export class EncomiendasComponent implements OnInit {
   aplicarFiltroRetiro( event ) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dsRetiros.filter = filterValue.trim().toLowerCase();
-    //
-    // if (this.dsRetiros.paginator) {
-    //   this.dsRetiros.paginator.firstPage();
-    // }
-    //
   }
   // function
   isExpansionDetailRowR = (i, row) => row.hasOwnProperty('detailRow');
@@ -188,6 +183,8 @@ export class EncomiendasComponent implements OnInit {
     this.encomienda.fecha_prometida = this.encomienda.llegada;
     if ( this.encomienda.fecha_prometida === undefined || this.encomienda.fecha_prometida === null ) {
       Swal.fire('CUIDADO', 'Fecha prometida de llegada no esta definida.');
+    } else if ( this.encomienda.fecha_sol_retiro === undefined || this.encomienda.fecha_sol_retiro === null ) {
+      Swal.fire('CUIDADO', 'Fecha de Solitud de Retiro no debe estar vacía.');
     } else if ( this.encomienda.valor_cobrado < 0 || ( this.encomienda.valor_cobrado === 0 && this.encomienda.tipo_pago !== 'GRATIS' ) ) {
       Swal.fire('CUIDADO', 'Debe indicar valor cobrado por la encomienda.');
     } else if ( this.encomienda.tipo_pago === '' ) {
@@ -418,7 +415,8 @@ export class EncomiendasComponent implements OnInit {
     // origen
     this.carga.id_paquete = 0;
     this.carga.recepcionista = this.login.usuario.id;
-    this.carga.fecha_creacion = new Date();
+    this.carga.fecha_creacion = (new Date()).toISOString();
+    this.carga.fecha_sol_retiro = (new Date()).toISOString();
     this.carga.cliente = 0;
     this.carga.xrutCliente = '';
     this.carga.xemailCliente = '';

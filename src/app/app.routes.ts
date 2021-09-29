@@ -11,4 +11,4 @@ const appRoutes: Routes = [
     { path: '', redirectTo: '/login', pathMatch: 'full' }
 ];
 
-export const APP_ROUTES = RouterModule.forRoot( appRoutes, { useHash: true } );
+export const APP_ROUTES = RouterModule.forRoot( appRoutes, { useHash: true, relativeLinkResolution: 'legacy' } );
